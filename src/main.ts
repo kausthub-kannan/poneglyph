@@ -1,99 +1,79 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { GraphQueryModal } from 'components/graph-query-modal';
+import { GraphQuerySettings, DEFAULT_SETTINGS, GraphQuerySettingTab } from './settings';
+import { deepSearch } from 'backend/agent';
+import { injectGraphColors } from 'backend/utils/tags';
 
-// Remember to rename these classes and interfaces!
+export default class GraphQueryPlugin extends Plugin {
+    settings: GraphQuerySettings;
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+    async onload() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+         this.app.workspace.onLayoutReady(() => injectGraphColors(this.app.vault));
+        this.addSettingTab(new GraphQuerySettingTab(this.app, this));
+        this.app.workspace.onLayoutReady(async () => {
+            this.injectButtonIntoGraphLeaves();
+        });
 
-	async onload() {
-		await this.loadSettings();
+        this.registerEvent(
+            this.app.workspace.on('active-leaf-change', async (leaf: WorkspaceLeaf | null) => {
+                if (leaf && leaf.getViewState().type === 'graph') {
+                    this.injectButtonIntoGraphLeaves();
+                }
+            })
+        );
+    }
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+    injectButtonIntoGraphLeaves() {
+        const graphLeaves = this.app.workspace.getLeavesOfType('graph');
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+        graphLeaves.forEach((leaf) => {
+            const container = leaf.view.containerEl;
+            if (container.querySelector('.custom-graph-query-btn')) return;
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
+            // Create the button element
+            const button = container.createEl('button', {
+                text: 'Search Graph',
+                cls: 'custom-graph-query-btn mod-cta' // 'mod-cta' applies Obsidian's accent color theme
+            });
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+            // Style the button to float over the graph canvas
+            Object.assign(button.style, {
+                position: 'absolute',
+                bottom: '30px',
+                right: '30px',
+                zIndex: '100',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
+            });
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
-		});
+            // Bind the click event to open your modal
+            button.addEventListener('click', () => {
+                new GraphQueryModal(this.app, (query) => {
+                    this.executeGraphQuery(query);
+                }).open();
+            });
+        });
+    }
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+    // The function triggered when "Enter" is pressed in the modal
+    async executeGraphQuery(query: string) {
+        if (!query.trim()) {
+            console.log("Empty query submitted.");
+            return;
+        }
 
-	}
+        console.log(`[Plugin Log] Executing query against graph context: ${query}`);
+        deepSearch(query, this.settings)
+    }
 
-	onunload() {
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MyPluginSettings>);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
+    onunload() {
+        // Clean up DOM injections to prevent memory leaks or ghost UI elements
+        document.querySelectorAll('.custom-graph-query-btn').forEach(button => {
+            button.remove();
+        });
+    }
 }

@@ -15,6 +15,7 @@ const context = await esbuild.context({
 	banner: {
 		js: banner,
 	},
+	platform: "node",
 	entryPoints: ["src/main.ts"],
 	bundle: true,
 	external: [
@@ -39,6 +40,17 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outfile: "main.js",
 	minify: prod,
+
+	define: {
+		"process.env.MODEL_PROVIDER": JSON.stringify(process.env.MODEL_PROVIDER),
+		"process.env.MODEL_API_KEY": JSON.stringify(process.env.MODEL_API_KEY),
+		"process.env.MODEL_ID": JSON.stringify(process.env.MODEL_ID),
+		"process.env.MAX_DEPTH": JSON.stringify(process.env.MAX_DEPTH),
+		"process.env.LANGCHAIN_TRACING_V2": JSON.stringify(process.env.LANGCHAIN_TRACING_V2),
+		"process.env.LANGCHAIN_API_KEY": JSON.stringify(process.env.LANGCHAIN_API_KEY),
+		"process.env.LANGCHAIN_PROJECT": JSON.stringify(process.env.LANGCHAIN_PROJECT),
+		"process.env.LANGCHAIN_ENDPOINT": JSON.stringify(process.env.LANGCHAIN_ENDPOINT),
+	}
 });
 
 if (prod) {

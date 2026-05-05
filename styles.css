@@ -1,8 +1,24 @@
-/*
+/* Place in vault/.obsidian/snippets/poneglyph-graph.css */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* Status → node color */
+.graph-view.color-fill-tag-draft      { color: #888888; }
+.graph-view.color-fill-tag-researched { color: #4a9eff; }
+.graph-view.color-fill-tag-verified   { color: #4caf50; }
 
-If your plugin does not need CSS, delete this file.
+/* Role → node accent */
+.graph-view.color-fill-tag-foundational { color: #ff9800; }
+.graph-view.color-fill-tag-tangential   { color: #9e9e9e; }
 
-*/
+/* Relation → edge color */
+.graph-view.color-line-tag-supports    { color: #4caf50; }
+.graph-view.color-line-tag-contradicts { color: #f44336; }
+.graph-view.color-line-tag-elaborates  { color: #ffeb3b; }
+
+/* RatifyView chrome */
+.poneglyph-meta        { display: flex; gap: 8px; margin-bottom: 12px; }
+.poneglyph-tag         { background: var(--background-modifier-border);
+                          border-radius: 4px; padding: 2px 8px;
+                          font-size: var(--font-smaller); }
+.poneglyph-preview     { border: 1px solid var(--background-modifier-border);
+                          border-radius: 6px; padding: 12px;
+                          max-height: 60vh; overflow-y: auto; }
