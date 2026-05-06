@@ -1,6 +1,9 @@
 import esbuild from "esbuild";
 import process from "process";
 import { builtinModules } from 'node:module';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const banner =
 `/*
@@ -50,6 +53,7 @@ const context = await esbuild.context({
 		"process.env.LANGCHAIN_API_KEY": JSON.stringify(process.env.LANGCHAIN_API_KEY),
 		"process.env.LANGCHAIN_PROJECT": JSON.stringify(process.env.LANGCHAIN_PROJECT),
 		"process.env.LANGCHAIN_ENDPOINT": JSON.stringify(process.env.LANGCHAIN_ENDPOINT),
+		"process.env.EMAIL": JSON.stringify(process.env.EMAIL),
 	}
 });
 

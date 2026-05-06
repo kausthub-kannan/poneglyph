@@ -6,6 +6,7 @@ export interface GraphQuerySettings {
   modelAPIKey: string;
   modelID: string;
   maxDepth: number;
+  email: string;
 }
 
 export const DEFAULT_SETTINGS: GraphQuerySettings = {
@@ -13,6 +14,7 @@ export const DEFAULT_SETTINGS: GraphQuerySettings = {
   modelAPIKey: process.env.MODEL_API_KEY || '',
   modelID: process.env.MODEL_ID || '',
   maxDepth: process.env.MAX_DEPTH ? parseInt(process.env.MAX_DEPTH, 10) : 3,
+  email: process.env.EMAIL || '',
 };
 
 export class GraphQuerySettingTab extends PluginSettingTab {
@@ -68,6 +70,18 @@ export class GraphQuerySettingTab extends PluginSettingTab {
         .setDynamicTooltip()
         .onChange(async (v: number) => {
           this.plugin.settings.maxDepth = v;
+          await this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName('Unpaywall Email')
+      .setDesc('Email address required by the Unpaywall API for fetching open access papers.')
+      .addText(text => text
+        .setValue(this.plugin.settings.email)
+        .setPlaceholder('user@example.com')
+        .onChange(async (v: string) => {
+          this.plugin.settings.email = v.trim();
           await this.plugin.saveSettings();
         })
       );
