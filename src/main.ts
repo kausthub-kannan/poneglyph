@@ -3,6 +3,7 @@ import { GraphQueryModal } from 'components/graph-query-modal';
 import { GraphQuerySettings, DEFAULT_SETTINGS, GraphQuerySettingTab } from './settings';
 import { deepResearch, stopDeepResearch } from 'backend/deep-research';
 import { injectGraphColors } from 'backend/utils/tags';
+import { loadSkills } from 'backend/utils/load-skills';
 
 
 export default class GraphQueryPlugin extends Plugin {
@@ -71,7 +72,7 @@ export default class GraphQueryPlugin extends Plugin {
                 }).open();
             });
 
-            stopButton.addEventListener('click', () => {
+            stopButton.addEventListener('click', async () => {
                 stopDeepResearch();
             }); 
         });

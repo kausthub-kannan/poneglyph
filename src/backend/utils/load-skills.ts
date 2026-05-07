@@ -5,7 +5,7 @@ export async function loadSkills(app: App): Promise<Record<string, FileData>> {
     const virtualFiles: Record<string, FileData> = {};
     
     // The physical path inside the Obsidian vault
-    const basePath = normalizePath(".obsidian/plugins/poneglyph/skills");
+    const basePath = normalizePath(".obsidian/plugins/poneglyph/src/backend/skills");
     
     // Failsafe: check if the directory exists
     const exists = await app.vault.adapter.exists(basePath);

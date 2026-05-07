@@ -14,10 +14,12 @@ import { loadSkills } from "./utils/load-skills";
 let activeAgentController: AbortController | null = null;
 
 if (typeof process !== "undefined" && process.env) {
-  process.env["LANGCHAIN_TRACING_V2"] = process.env.LANGCHAIN_TRACING_V2;
-  process.env["LANGCHAIN_API_KEY"] = process.env.LANGCHAIN_API_KEY;
-  process.env["LANGCHAIN_PROJECT"] = process.env.LANGCHAIN_PROJECT;
-  process.env["LANGCHAIN_ENDPOINT"] = process.env.LANGCHAIN_ENDPOINT;
+  Object.assign(process.env, {
+    LANGCHAIN_TRACING_V2: process.env.LANGCHAIN_TRACING_V2,
+    LANGCHAIN_API_KEY: process.env.LANGCHAIN_API_KEY,
+    LANGCHAIN_PROJECT: process.env.LANGCHAIN_PROJECT,
+    LANGCHAIN_ENDPOINT: process.env.LANGCHAIN_ENDPOINT,
+  });
 }
 
 async function deepResearch(
