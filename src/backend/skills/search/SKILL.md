@@ -1,12 +1,32 @@
 ---
-name: query-doi-fulltext-serach
-description: >
+name: search
+description: >-
   Use this skill whenever the user wants to find academic papers, search for research on a topic,
   retrieve paper metadata (h-index, i10-index, citedness), or obtain the full text of a paper.
   Triggers include: "find papers on X", "search for research about X", "get me the PDF of this paper",
   "find high-impact papers on X", "look up this DOI", "get citations for X", or any request that
   involves locating, evaluating, or downloading academic literature. Also trigger when the user
   provides a DOI and wants either metadata or full text.
+---
+
+A skill for discovering, filtering, and retrieving high-quality academic literature on any topic
+and depositing citable, DOI-anchored findings into a finished, graph-connected note.
+
+---
+
+## Core Philosophy
+
+Search is not just pulling papers — it's **triangulating evidence** across methods,
+replication attempts, and competing theoretical frameworks. Every search session should
+leave the vault with stronger sourcing: new wikilinks to constructs and authors, surfaced
+contradictions between studies, and explicit trails for what still needs investigating.
+
+A good literature note answers three things:
+
+1. **What is established?** — Findings with strong citation weight, replicated across studies.
+2. **What is contested?** — Conflicting results, methodological disputes, rival frameworks.
+3. **What is missing?** — Gaps in the literature, understudied populations, open empirical questions.
+
 ---
 
 ### Tool Stack

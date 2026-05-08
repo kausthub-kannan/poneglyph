@@ -33,6 +33,7 @@
 		"langchain": "^1.3.5",
 		"langsmith": "^0.6.0",
 		"litellm": "^0.12.0",
+		"micromatch": "^4.0.8",
 		"obsidian": "latest",
 		"pdfjs-dist": "^5.7.284"
 	}

@@ -4,15 +4,20 @@ import { type FileData } from "deepagents";
 export async function loadSkills(app: App): Promise<Record<string, FileData>> {
     const virtualFiles: Record<string, FileData> = {};
     
-    // The physical path inside the Obsidian vault
     const basePath = normalizePath(".obsidian/plugins/poneglyph/src/backend/skills");
     
-    // Failsafe: check if the directory exists
     const exists = await app.vault.adapter.exists(basePath);
     if (!exists) return virtualFiles;
 
-    // List all folders inside the skills directory (e.g., literature-extractor)
     const listResult = await app.vault.adapter.list(basePath);
+
+    // Register the root /skills/ directory itself
+    virtualFiles["/skills"] = {
+        content: "",
+        mimeType: "inode/directory",
+        created_at: new Date().toISOString(),
+        modified_at: new Date().toISOString(),
+    };
     
     for (const folderPath of listResult.folders) {
         const skillFilePath = normalizePath(`${folderPath}/SKILL.md`);
@@ -20,12 +25,18 @@ export async function loadSkills(app: App): Promise<Record<string, FileData>> {
         if (await app.vault.adapter.exists(skillFilePath)) {
             const content = await app.vault.adapter.read(skillFilePath);
             const stat = await app.vault.adapter.stat(skillFilePath);
+            const skillName = folderPath.split('/').pop();
+
+            // Register the skill subdirectory entry
+            virtualFiles[`/skills/${skillName}`] = {
+                content: "",
+                mimeType: "inode/directory",
+                created_at: new Date(stat?.ctime || Date.now()).toISOString(),
+                modified_at: new Date(stat?.mtime || Date.now()).toISOString(),
+            };
             
-            // Extract the skill folder name to map it to the virtual path
-            const skillName = folderPath.split('/').pop(); 
-            const virtualPath = `/skills/${skillName}/SKILL.md`;
-            
-            virtualFiles[virtualPath] = {
+            // Register the SKILL.md file
+            virtualFiles[`/skills/${skillName}/SKILL.md`] = {
                 content: content,
                 mimeType: "text/markdown",
                 created_at: new Date(stat?.ctime || Date.now()).toISOString(),

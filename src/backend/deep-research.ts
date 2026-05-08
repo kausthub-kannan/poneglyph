@@ -1,4 +1,4 @@
-import { createDeepAgent } from "deepagents";
+import { createDeepAgent, createSkillsMiddleware, } from "deepagents";
 import { sciHubFullTextTool } from "./tools/source/scihub";
 import { arxivFullTextTool } from "./tools/source/arxiv";
 import { createUnpaywallTool } from "./tools/source/unpaywall";
@@ -7,10 +7,9 @@ import { getModel } from "./utils/model-provider";
 import { GraphQuerySettings } from "settings";
 import { appendMarkdownTool, readMarkdownTool, writeMarkdownTool } from "./tools/markdown-management";
 import { openAlexSearchTool } from "./tools/search/open-alex";
-import { App } from "obsidian";
+import { App, Notice } from "obsidian";
 import { loadSkills } from "./utils/load-skills";
-
-// Keep a reference to the active controller
+import { ObsidianVaultBackend } from "./utils/obsidian-backend";
 let activeAgentController: AbortController | null = null;
 
 if (typeof process !== "undefined" && process.env) {
@@ -27,7 +26,7 @@ async function deepResearch(
   searchQuery: string,
   settings: GraphQuerySettings
 ): Promise<string> {
-
+  
   const llm = getModel(settings, 0.2);
   const virtualFileSystem = await loadSkills(app);
 
@@ -37,16 +36,20 @@ async function deepResearch(
   const searchTools = [openAlexSearchTool]
   const markdownTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool]
 
-  const agent = await createDeepAgent({
+  const agent = createDeepAgent({
     model: llm,
     tools: [...searchTools, ...sourceTextTools, ...markdownTools],
     systemPrompt: systemPrompt,
-    skills: [
-      "/skills/markdown/",
-      "/skills/research/",
-      "/skills/search/"
-    ],
+    middleware: [
+      createSkillsMiddleware({
+        backend: new ObsidianVaultBackend(app),
+        sources: ["/skills"]
+      })
+    ]
   });
+
+  console.log("virtualFileSystem")
+  console.log(virtualFileSystem)
 
   try {
     const result = await agent.invoke({

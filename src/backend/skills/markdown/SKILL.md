@@ -1,7 +1,11 @@
 ---
-name: markdown-writer
-description: >
-    This skill is a mandatory protocol for any operation involving file creation or modification within the Obsidian vault, serving as a prerequisite for the writeMarkdownTool and appendMarkdownTool. It enforces the standardized architecture of the vault by defining strict file-naming conventions, mandatory metadata requirements, and structural templates that must be applied before any content is committed. Essentially, any time write access to markdown files is required, this skill provides the blueprint for how the document must be organized and formatted to ensure consistent integration and long-term searchability within the ecosystem.
+name: markdown
+description: >-
+  Use this skill before any operation that creates or modifies a markdown file
+  in the Obsidian vault. It defines the required frontmatter schema, tag
+  taxonomy, heading hierarchy, citation format, and the finalization checklist
+  including how to update Sources.md. Always apply this skill when invoking
+  writeMarkdownTool or appendMarkdownTool.
 ---
 
 # Markdown Write Tool

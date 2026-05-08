@@ -86,7 +86,7 @@ export default class GraphQueryPlugin extends Plugin {
         }
 
         console.log(`[Plugin Log] Executing query against graph context: ${query}`);
-        deepResearch(this.app, query, this.settings)
+        await deepResearch(this.app, query, this.settings)
     }
 
     onunload() {
