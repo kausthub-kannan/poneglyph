@@ -1,5 +1,5 @@
 ---
-name: reserach
+name: research
 description: >-
   Reserach, understand and produce well structured, academic toned notes based on the academic paper raw text extracted from arixv and other places. The raw data is analysed with respect to other paper texts and provided markdown content. Use this skill after the serach and fulltext of papers have been obtained. The strcutured academic note will be later writtem by write tools. 
 ---

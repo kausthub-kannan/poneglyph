@@ -7,7 +7,7 @@ import { getModel } from "./utils/model-provider";
 import { GraphQuerySettings } from "settings";
 import { appendMarkdownTool, readMarkdownTool, writeMarkdownTool } from "./tools/markdown-management";
 import { openAlexSearchTool } from "./tools/search/open-alex";
-import { App, Notice } from "obsidian";
+import { App } from "obsidian";
 import { loadSkills } from "./utils/load-skills";
 import { ObsidianVaultBackend } from "./utils/obsidian-backend";
 let activeAgentController: AbortController | null = null;
@@ -48,9 +48,6 @@ async function deepResearch(
     ]
   });
 
-  console.log("virtualFileSystem")
-  console.log(virtualFileSystem)
-
   try {
     const result = await agent.invoke({
       messages: [{ role: "user", content: userPrompt.replace("{{query}}", searchQuery) }],
@@ -68,7 +65,6 @@ async function deepResearch(
 
   } catch (error: any) {
     if (error.name === "AbortError") {
-      console.log("Deep research was halted by the user.");
       return "Research extraction stopped.";
     }
     

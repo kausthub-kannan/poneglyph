@@ -5,7 +5,7 @@ description: >-
   in the Obsidian vault. It defines the required frontmatter schema, tag
   taxonomy, heading hierarchy, citation format, and the finalization checklist
   including how to update Sources.md. Always apply this skill when invoking
-  writeMarkdownTool or appendMarkdownTool.
+  write markdown tool or append markdown tool.
 ---
 
 # Markdown Write Tool
@@ -38,8 +38,8 @@ title: "The title of the note; same as the filename saved as [filename].md"
 tags:
   - draft              # Start with draft; replace with researched when done
   - <topic-tag>        # Add one or more specific topic tags (see Tag Taxonomy below)
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
+created: YYYY-MM-DD    # Current Date
+updated: YYYY-MM-DD    # Current Date
 ---
 ```
 

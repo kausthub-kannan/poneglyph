@@ -1,9 +1,9 @@
 import { Vault } from 'obsidian';
 
 const FIXED_GROUPS = [
-  { tag: "#draft",      hex: "eab308" }, // Yellow
-  { tag: "#researched", hex: "3b82f6" }, // Blue
-  { tag: "#verified",   hex: "22c55e" }, // Green
+  { tag: "draft",      hex: "eab308" }, // Yellow
+  { tag: "researched", hex: "3b82f6" }, // Blue
+  { tag: "verified",   hex: "22c55e" }, // Green
 ];
 
 export async function injectGraphColors(vault: Vault) {
