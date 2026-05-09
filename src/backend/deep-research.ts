@@ -10,6 +10,8 @@ import { openAlexSearchTool } from "./tools/search/open-alex";
 import { App } from "obsidian";
 import { loadSkills } from "./utils/load-skills";
 import { ObsidianVaultBackend } from "./utils/obsidian-backend";
+import { addSourceTool } from "./tools/add-source";
+import { updateStatusTool } from "./tools/update-status";
 let activeAgentController: AbortController | null = null;
 
 if (typeof process !== "undefined" && process.env) {
@@ -34,7 +36,7 @@ async function deepResearch(
 
   const sourceTextTools = [sciHubFullTextTool, arxivFullTextTool, createUnpaywallTool(settings.email)]
   const searchTools = [openAlexSearchTool]
-  const markdownTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool]
+  const markdownTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool, addSourceTool, updateStatusTool]
 
   const agent = createDeepAgent({
     model: llm,

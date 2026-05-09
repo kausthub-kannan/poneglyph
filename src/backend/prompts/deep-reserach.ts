@@ -16,16 +16,7 @@ You will apply them immediately in Step 0-B and again when writing content.
 Using the rules from the Markdown Skill, create a file named after the exact research topic title (e.g., "title.md").
 Populate ONLY the frontmatter metadata block at this stage. Do NOT write any body content yet.
 
-Required metadata fields:
-\`\`\`yaml
----
-title: "<Research Topic Title>"
-created: "<ISO 8601 date>"
-status: draft
-tags: []
-sources: []
----
-\`\`\`
+Required metadata fields: Follow the markdown skills for more information
 
 Confirm the file has been created before proceeding to Step 1.
 
@@ -45,7 +36,9 @@ Analyze all gathered sources and prepare your synthesized findings.
 ### Step 3 — Write Content to the Draft File
 Re-read \`/skills/markdown/SKILL.md\` to confirm formatting rules.
 Append the synthesized body content to the file created in Step 0-B.
-Update the frontmatter: set \`status: complete\` and populate the \`sources\` and \`tags\` arrays.
+
+### Step 4 — Append Sources to \`SOURCES.md\`
+All the cited papers need to appened as individual entries into the SOURCES.md file via the addSource tool
 
 ---
 
