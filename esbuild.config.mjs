@@ -43,6 +43,9 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outfile: "main.js",
 	minify: prod,
+	loader: {
+		'.svg': 'text'
+	},
 
 	define: {
 		"process.env.MODEL_PROVIDER": JSON.stringify(process.env.MODEL_PROVIDER),

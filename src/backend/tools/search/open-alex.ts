@@ -7,7 +7,7 @@ export const openAlexSearchTool = new DynamicStructuredTool({
   description: "Searches the OpenAlex database for academic papers. Use this to find peer-reviewed papers, abstracts, authors, and publication years.",
   schema: z.object({
     query: z.string().describe("The search query (e.g., 'large language models in healthcare')"),
-    limit: z.number().optional().default(3).describe("Number of papers to return. Keep it small (e.g., 3-5) to avoid exceeding context limits."),
+    limit: z.number().optional().default(3).describe("Number of papers to return. Keep it small (e.g., 5-7) to avoid exceeding context limits."),
   }),
   func: async ({ query, limit = 3 }) => {
     try {

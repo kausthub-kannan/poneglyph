@@ -12,7 +12,9 @@ import { loadSkills } from "./utils/load-skills";
 import { ObsidianVaultBackend } from "./utils/obsidian-backend";
 import { addSourceTool } from "./tools/add-source";
 import { updateStatusTool } from "./tools/update-status";
+import { generateQueries } from "./query-generation";
 let activeAgentController: AbortController | null = null;
+let agentRunning = false;
 
 if (typeof process !== "undefined" && process.env) {
   Object.assign(process.env, {
@@ -25,7 +27,7 @@ if (typeof process !== "undefined" && process.env) {
 
 async function deepResearch(
   app: App,
-  searchQuery: string,
+  ideaText: string,
   settings: GraphQuerySettings
 ): Promise<string> {
   
@@ -33,6 +35,7 @@ async function deepResearch(
   const virtualFileSystem = await loadSkills(app);
 
   activeAgentController = new AbortController();
+  agentRunning = true;
 
   const sourceTextTools = [sciHubFullTextTool, arxivFullTextTool, createUnpaywallTool(settings.email)]
   const searchTools = [openAlexSearchTool]
@@ -51,8 +54,9 @@ async function deepResearch(
   });
 
   try {
+    const queries = await generateQueries(ideaText, settings);
     const result = await agent.invoke({
-      messages: [{ role: "user", content: userPrompt.replace("{{query}}", searchQuery) }],
+      messages: [{ role: "user", content: userPrompt.replace("{{query}}", queries) }],
       files: virtualFileSystem,
     }, {
       signal: activeAgentController.signal
@@ -74,6 +78,7 @@ async function deepResearch(
     throw error;
     
   } finally {
+    agentRunning = false;
     activeAgentController = null;
   }
 }
@@ -85,4 +90,4 @@ function stopDeepResearch() {
   }
 }
 
-export { deepResearch, stopDeepResearch };
+export { deepResearch, stopDeepResearch, agentRunning };

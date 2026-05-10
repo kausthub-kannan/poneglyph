@@ -1,12 +1,16 @@
+import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOllama } from "@langchain/ollama";
+import { ChatOpenAI } from "@langchain/openai";
 import type { GraphQuerySettings } from "settings";
 
-// 1. Use 'as const' so TypeScript knows the exact allowed keys
 const modelDirectory = {
-    "mistral": ChatMistralAI
+    "mistral": ChatMistralAI,
+    "anthropic": ChatAnthropic,
+    "ollama": ChatOllama,
+    "openai": ChatOpenAI
 } as const;
 
-// 2. Define a type based on the keys of your directory
 type SupportedProvider = keyof typeof modelDirectory;
 
 const getModel = (
@@ -21,12 +25,18 @@ const getModel = (
         throw new Error(`Provider "${settings.modelProvider}" is not supported.`);
     }
 
-    // 4. TypeScript now recognizes ModelClass as a constructor
-    return new ModelClass({
+    const ModelConstructor = ModelClass as any;
+    
+    const config: Record<string, any> = {
         model: settings.modelID,
         temperature: temperature,
-        apiKey: settings.modelAPIKey
-    });
+    };
+
+    if (settings.modelAPIKey) {
+        config.apiKey = settings.modelAPIKey;
+    }
+
+    return new ModelConstructor(config);
 };
 
-export { getModel };
+export { getModel, modelDirectory };
