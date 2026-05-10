@@ -43,7 +43,7 @@ export class GraphQuerySettingTab extends PluginSettingTab {
     banner.createEl('div', { cls: 'poneglyph-banner-icon', text: '𓂀' });
     const bannerText = banner.createDiv({ cls: 'poneglyph-banner-text' });
     bannerText.createEl('h2', { text: 'Poneglyph' });
-    bannerText.createEl('p', { text: 'Knowledge graph powered by AI — configure your research engine below.' });
+    bannerText.createEl('p', { text: 'A living knowledge graph — you steer, AI does the digging.' });
 
     // ── Section 1: Model Provider ─────────────────────────────────────────────
     this.createSectionHeader(
@@ -220,7 +220,8 @@ export class GraphQuerySettingTab extends PluginSettingTab {
         flex-shrink: 0;
       }
       .poneglyph-banner-text h2 {
-        margin: 0 0 4px;
+        margin: 0 0 30px;
+        padding: 0; !important
         font-size: 1.25rem;
         font-weight: 700;
         color: var(--text-normal);
@@ -241,7 +242,8 @@ export class GraphQuerySettingTab extends PluginSettingTab {
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--text-accent);
-        margin: 0 0 3px;
+        margin: 0;
+        padding: 0 !important ;
       }
       .poneglyph-section-desc {
         font-size: 0.82rem;

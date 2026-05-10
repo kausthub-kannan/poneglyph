@@ -34,8 +34,8 @@ A good literature note answers three things:
 | Tool | Purpose |
 |------|---------|
 | **OpenAlex** (DOI search from query) | Primary discovery — find candidate papers |
-| **Unpaywall** | Full-text retrieval — always try first |
-| **arXiv / other fulltext tools** | Full-text fallback if Unpaywall fails |
+| **Unpaywall** | Full-text retrieval — the default search enginer in our case |
+| **arXiv / other fulltext tools** | Full-text for 'arxiv' papers. Use it whenever the doi has the word 'arxiv' in it |
 | **Sci-Hub fulltext tool** | Last resort only — use if all above fail |
 
 ---
@@ -63,9 +63,9 @@ Don't retrieve full text for every result — shortlist the strongest candidates
 
 For each shortlisted DOI, attempt retrieval in this strict order. **Stop at the first success.**
 
-Unpaywall          ← always first
-arXiv fulltext     ← if Unpaywall returns no OA copy
-[other fulltext tools as available]
+Unpaywall          ← Full-text retrieval — the default search enginer in our case
+arXiv fulltext     ← Do not use this tool unless the doi has the word 'arxiv' in it
+[other fulltext tools similar to arXiv fulltext tool, .i.e if the doi has similarity to the tool name use it else go to default .i.e Unpaywall]
 Sci-Hub            ← last resort only, if all above fail
 
 
