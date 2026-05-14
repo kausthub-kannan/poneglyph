@@ -1,6 +1,8 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
-import { App, TFile } from "obsidian";
+import { App, Notice, TFile } from "obsidian";
+import { ChromaClient } from "chromadb-client";
+import { injectBacklinks } from "backend/vector-db/back-link";
 
 declare const app: App;
 
@@ -28,6 +30,14 @@ export const updateStatusTool = new DynamicStructuredTool({
             
             const newContent = existingContent.replace(previous_status, next_status);
             await app.vault.modify(file, newContent);
+
+            // Add backlink when status is "researched"
+            if (next_status === "researched"){
+                const client = new ChromaClient();
+                const content = await app.vault.read(file);
+                const updatedContent = await injectBacklinks(client, content, file.name);
+                await app.vault.modify(file, updatedContent);
+            }
             
             return `Successfully updated status from "${previous_status}" to "${next_status}" in: ${normalizedPath}`;
         } catch (error) {

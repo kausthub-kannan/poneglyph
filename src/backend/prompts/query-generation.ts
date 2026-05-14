@@ -22,20 +22,16 @@ Your task is to analyze the given thesis or idea and generate a diverse, well-st
 Return a JSON object with the following structure — no preamble, no markdown fences, no extra commentary:
 
 {
-  "topic": "<one-line summary of the thesis/idea>",
   "queries": [
     {
-      "id": 1,
       "query": "<the search query or question>",
-      "type": "<keyword | natural_language>",
       "category": "<foundational | core | comparative | applied | critical | existing>",
-      "rationale": "<one sentence explaining why this query is relevant>"
     }
   ]
 }
 
 Use category "existing" for queries that were already present in the input text.
-Aim for average of 5-7 queries unless the content gievn for the topic, IDEA.md is narrow, in which case quality over quantity.
+If the content given for the topic, IDEA.md is narrow, in which case quality over quantity.
 More dense the IDEA.md more queries should be generated.
 `
 

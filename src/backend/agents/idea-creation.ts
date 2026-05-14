@@ -1,14 +1,14 @@
-import { getModel } from "./utils/model-provider";
-import { systemPrompt, userPrompt } from "./prompts/query-generation";
+import { getModel } from "backend/utils/model-provider";
+import { systemPrompt, userPrompt } from "backend/prompts/query-generation";
 import type { GraphQuerySettings } from "settings";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 
-export async function generateQueries(ideaText: string, settings: GraphQuerySettings): Promise<string> {
+export async function createIdea(existingData: string, settings: GraphQuerySettings): Promise<string> {
     const model = getModel(settings);
 
     const messages = [
         new SystemMessage(systemPrompt),
-        new HumanMessage(userPrompt.replace("{{ideaText}}", ideaText))
+        new HumanMessage(userPrompt.replace("{{existingData}}", existingData))
     ];
 
     const response = await model.invoke(messages);

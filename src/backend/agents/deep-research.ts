@@ -1,17 +1,17 @@
 import { createDeepAgent, createSkillsMiddleware, } from "deepagents";
-import { sciHubFullTextTool } from "./tools/source/scihub";
-import { arxivFullTextTool } from "./tools/source/arxiv";
-import { createUnpaywallTool } from "./tools/source/unpaywall";
-import { systemPrompt, userPrompt } from "./prompts/deep-reserach";
-import { getModel } from "./utils/model-provider";
+import { sciHubFullTextTool } from "backend/tools/source/scihub";
+import { arxivFullTextTool } from "backend/tools/source/arxiv";
+import { createUnpaywallTool } from "backend/tools/source/unpaywall";
+import { systemPrompt, userPrompt } from "backend/prompts/deep-reserach";
+import { getModel } from "backend/utils/model-provider";
 import { GraphQuerySettings } from "settings";
-import { appendMarkdownTool, readMarkdownTool, writeMarkdownTool } from "./tools/markdown-management";
-import { openAlexSearchTool } from "./tools/search/open-alex";
+import { appendMarkdownTool, readMarkdownTool, writeMarkdownTool } from "backend/tools/markdown-management";
+import { openAlexSearchTool } from "backend/tools/search/open-alex";
 import { App } from "obsidian";
-import { loadSkills } from "./utils/load-skills";
-import { ObsidianVaultBackend } from "./utils/obsidian-backend";
-import { addSourceTool } from "./tools/add-source";
-import { updateStatusTool } from "./tools/update-status";
+import { loadSkills } from "backend/utils/load-skills";
+import { ObsidianVaultBackend } from "backend/utils/obsidian-backend";
+import { addSourceTool } from "backend/tools/add-source";
+import { updateStatusTool } from "backend/tools/update-status";
 import { generateQueries } from "./query-generation";
 let activeAgentController: AbortController | null = null;
 let agentRunning = false;
@@ -30,7 +30,7 @@ async function deepResearch(
   ideaText: string,
   settings: GraphQuerySettings
 ): Promise<string> {
-  
+
   const llm = getModel(settings, 0.2);
   const virtualFileSystem = await loadSkills(app);
 
@@ -73,10 +73,10 @@ async function deepResearch(
     if (error.name === "AbortError") {
       return "Research extraction stopped.";
     }
-    
+
     console.error("Agent encountered an error:", error);
     throw error;
-    
+
   } finally {
     agentRunning = false;
     activeAgentController = null;

@@ -1,7 +1,9 @@
 import { Notice, TFile } from 'obsidian';
 import GraphideaPlugin from '../main';
-import { deepResearch, stopDeepResearch } from '../backend/deep-research';
+import { deepResearch, stopDeepResearch } from 'backend/agents/deep-research';
 import { IDEA_MD_TEMPLATE } from 'backend/utils/helper';
+import { ChromaClient } from 'chromadb-client';
+import { injectBacklinks } from 'backend/vector-db/back-link';
 
 const LOADING_BAR_BLOCK = `<div style="text-align:center;">\n<i>Agent in progress...</i>\n<progress value="100" max="100" style="width:100%; height:6px; accent-color:var(--color-accent);"></progress>\n</div>\n`;
 
@@ -63,4 +65,35 @@ export function registerCommands(plugin: GraphideaPlugin) {
             }
         }
     });
+        plugin.addCommand({
+        id: 'inject-backlinks',
+        name: 'Inject Backlinks',
+        callback: async () => {
+            const file = plugin.app.workspace.getActiveFile();
+            if (!file) {
+                new Notice('No active file. Please open a note first.');
+                return;
+            }
+ 
+            new Notice('Injecting backlinks...');
+ 
+            try {
+                const client = new ChromaClient();
+                const content = await plugin.app.vault.read(file);
+                const updatedContent = await injectBacklinks(client, content, file.name);
+ 
+                if (updatedContent === content) {
+                    new Notice('No relevant backlinks found.');
+                    return;
+                }
+ 
+                await plugin.app.vault.modify(file, updatedContent);
+                new Notice('Backlinks injected successfully.');
+            } catch (error) {
+                new Notice('Failed to inject backlinks.');
+                console.error(error);
+            }
+        }
+    });
 }
+ 

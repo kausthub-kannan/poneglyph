@@ -2,10 +2,11 @@ import { Plugin, TFile } from 'obsidian';
 import { GraphQuerySettings, DEFAULT_SETTINGS, GraphQuerySettingTab } from './settings';
 import { configureGraphSettings } from 'backend/utils/tags';
 import { registerCommands, removeLoadingBar } from './components/cli';
-import { stopDeepResearch } from './backend/deep-research';
+import { stopDeepResearch } from './backend/agents/deep-research';
 import { setupFileExplorerIcons } from './components/file-explorer';
 import { setupMarkdowns } from 'backend/utils/helper';
-
+import { drainOfflineQueue, onFileCreated, onFileDeleted, onFileModified } from 'backend/vector-db/file-listeners';
+import { indexVault } from 'backend/vector-db/auto-index';
 
 export default class GraphQueryPlugin extends Plugin {
     settings: GraphQuerySettings;
@@ -17,6 +18,21 @@ export default class GraphQueryPlugin extends Plugin {
         setupMarkdowns(this.app);
         registerCommands(this);
         setupFileExplorerIcons(this);
+
+        await drainOfflineQueue(this.app.vault);
+        await indexVault(this.app.vault);
+
+        this.registerEvent(this.app.vault.on('create', (file) => {
+            if (file instanceof TFile && file.extension === 'md')
+                onFileCreated(file, this.app.vault);
+        }));
+        this.registerEvent(this.app.vault.on('delete', (file) => {
+            if (file instanceof TFile) onFileDeleted(file);
+        }));
+        this.registerEvent(this.app.vault.on('modify', (file) => {
+            if (file instanceof TFile && file.extension === 'md')
+                onFileModified(file, this.app.vault);
+        }));
     }
 
     onunload() {

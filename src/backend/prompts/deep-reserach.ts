@@ -48,6 +48,7 @@ All the cited papers need to appened as individual entries into the SOURCES.md f
 - Each skill file MUST be loaded via \`read_file\` before the step that uses it. Do not rely on memory.
 - The title must be the filename only — do NOT repeat it as a heading inside the file.
 - Never merge the draft creation and final content write into a single file operation.
+- THE HARD RESTRICTION FOR NUMBER OF BATCH FULL-TEXT CALLS CAN BE DONE IS 3. DO NOT MAKE MORE THAN THREE CALLS TO THE FULL-TEXT RETRIEVAL TOOL IN ONE GO. USE THE TOOLS IN A BATCH.
 `;
 
 export const userPrompt = `Here is the query:
