@@ -26,6 +26,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'start-deep-research',
         name: 'Start Deep Research',
         callback: async () => {
+            console.log('[DEBUG] Command triggered at', new Date().toISOString());
             const file = plugin.app.vault.getFiles().find((f: TFile) => f.name === 'IDEA.md');
             if (!file) {
                 new Notice('IDEA.md not found in the vault.');
@@ -45,8 +46,8 @@ export function registerCommands(plugin: GraphideaPlugin) {
                 await deepResearch(plugin.app, cleansedIdea, plugin.settings);
                 new Notice('Deep Research finished.');
             } catch (error) {
-                new Notice('Deep Research encountered an error.');
                 console.error(error);
+                new Notice(error instanceof Error ? error.message : String(error));
             } finally {
                 await removeLoadingBar(plugin, file);
             }
@@ -65,7 +66,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
             }
         }
     });
-        plugin.addCommand({
+    plugin.addCommand({
         id: 'inject-backlinks',
         name: 'Inject Backlinks',
         callback: async () => {
@@ -74,19 +75,19 @@ export function registerCommands(plugin: GraphideaPlugin) {
                 new Notice('No active file. Please open a note first.');
                 return;
             }
- 
+
             new Notice('Injecting backlinks...');
- 
+
             try {
                 const client = new ChromaClient();
                 const content = await plugin.app.vault.read(file);
                 const updatedContent = await injectBacklinks(client, content, file.name);
- 
+
                 if (updatedContent === content) {
                     new Notice('No relevant backlinks found.');
                     return;
                 }
- 
+
                 await plugin.app.vault.modify(file, updatedContent);
                 new Notice('Backlinks injected successfully.');
             } catch (error) {
@@ -96,4 +97,4 @@ export function registerCommands(plugin: GraphideaPlugin) {
         }
     });
 }
- 
+

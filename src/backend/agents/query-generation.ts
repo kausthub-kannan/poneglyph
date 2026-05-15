@@ -11,8 +11,10 @@ export async function generateQueries(ideaText: string, settings: GraphQuerySett
         new HumanMessage(userPrompt.replace("{{ideaText}}", ideaText))
     ];
 
+    console.log("messages", messages)
+
     const response = await model.invoke(messages);
     console.log("response", response)
 
-    return typeof response.content === "string" ? response.content : JSON.stringify(response.content);
+    return typeof response.content === "string" ? response.content : JSON.stringify(response.content); //
 }

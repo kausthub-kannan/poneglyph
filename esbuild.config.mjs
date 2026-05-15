@@ -64,20 +64,21 @@ const context = await esbuild.context({
           loader: "js",
         }));
       },
-    },
+    }
 	],
 
 	define: {
-		'import.meta.url': 'importMetaUrl',
 		"process.env.MODEL_PROVIDER": JSON.stringify(process.env.MODEL_PROVIDER),
 		"process.env.MODEL_API_KEY": JSON.stringify(process.env.MODEL_API_KEY),
 		"process.env.MODEL_ID": JSON.stringify(process.env.MODEL_ID),
 		"process.env.MAX_DEPTH": JSON.stringify(process.env.MAX_DEPTH),
-		"process.env.LANGCHAIN_TRACING_V2": JSON.stringify(process.env.LANGCHAIN_TRACING_V2),
-		"process.env.LANGCHAIN_API_KEY": JSON.stringify(process.env.LANGCHAIN_API_KEY),
-		"process.env.LANGCHAIN_PROJECT": JSON.stringify(process.env.LANGCHAIN_PROJECT),
-		"process.env.LANGCHAIN_ENDPOINT": JSON.stringify(process.env.LANGCHAIN_ENDPOINT),
-		"process.env.EMAIL": JSON.stringify(process.env.EMAIL),
+
+		"process.env.LANGSMITH_TRACING": JSON.stringify(process.env.LANGSMITH_TRACING),
+		"process.env.LANGSMITH_API_KEY": JSON.stringify(process.env.LANGSMITH_API_KEY),
+		"process.env.LANGSMITH_PROJECT": JSON.stringify(process.env.LANGSMITH_PROJECT),
+		"process.env.LANGSMITH_ENDPOINT": JSON.stringify(process.env.LANGSMITH_ENDPOINT),
+
+		"process.env.LANGSMITH_DISABLE_RUN_COMPRESSION": JSON.stringify(process.env.LANGSMITH_DISABLE_RUN_COMPRESSION)
 	},
 
 });

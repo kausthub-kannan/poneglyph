@@ -8,31 +8,34 @@ import { setupMarkdowns } from 'backend/utils/helper';
 import { drainOfflineQueue, onFileCreated, onFileDeleted, onFileModified } from 'backend/vector-db/file-listeners';
 import { indexVault } from 'backend/vector-db/auto-index';
 
+// Add this to see the exact request being mad
+
 export default class GraphQueryPlugin extends Plugin {
     settings: GraphQuerySettings;
 
     async onload() {
+        console.log(100)
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
         this.app.workspace.onLayoutReady(() => configureGraphSettings(this.app.vault));
         this.addSettingTab(new GraphQuerySettingTab(this.app, this));
         setupMarkdowns(this.app);
         registerCommands(this);
         setupFileExplorerIcons(this);
+        
+        // await drainOfflineQueue(this.app.vault);
+        // await indexVault(this.app.vault);
 
-        await drainOfflineQueue(this.app.vault);
-        await indexVault(this.app.vault);
-
-        this.registerEvent(this.app.vault.on('create', (file) => {
-            if (file instanceof TFile && file.extension === 'md')
-                onFileCreated(file, this.app.vault);
-        }));
-        this.registerEvent(this.app.vault.on('delete', (file) => {
-            if (file instanceof TFile) onFileDeleted(file);
-        }));
-        this.registerEvent(this.app.vault.on('modify', (file) => {
-            if (file instanceof TFile && file.extension === 'md')
-                onFileModified(file, this.app.vault);
-        }));
+        // this.registerEvent(this.app.vault.on('create', (file) => {
+        //     if (file instanceof TFile && file.extension === 'md')
+        //         onFileCreated(file, this.app.vault);
+        // }));
+        // this.registerEvent(this.app.vault.on('delete', (file) => {
+        //     if (file instanceof TFile) onFileDeleted(file);
+        // }));
+        // this.registerEvent(this.app.vault.on('modify', (file) => {
+        //     if (file instanceof TFile && file.extension === 'md')
+        //         onFileModified(file, this.app.vault);
+        // }));
     }
 
     onunload() {

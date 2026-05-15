@@ -18,10 +18,12 @@ let agentRunning = false;
 
 if (typeof process !== "undefined" && process.env) {
   Object.assign(process.env, {
-    LANGCHAIN_TRACING_V2: process.env.LANGCHAIN_TRACING_V2,
-    LANGCHAIN_API_KEY: process.env.LANGCHAIN_API_KEY,
-    LANGCHAIN_PROJECT: process.env.LANGCHAIN_PROJECT,
-    LANGCHAIN_ENDPOINT: process.env.LANGCHAIN_ENDPOINT,
+    LANGSMITH_TRACING: process.env.LANGSMITH_TRACING,
+    LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
+    LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
+    LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
+
+    LANGSMITH_DISABLE_RUN_COMPRESSION: process.env.LANGSMITH_DISABLE_RUN_COMPRESSION,
   });
 }
 

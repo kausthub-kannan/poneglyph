@@ -1,7 +1,6 @@
 import { buildMetadata, COLLECTION_NAME, dequeueOp, enqueueOp, getChromaClient, isSignificantChange, loadQueue, pendingUpdates, UPDATE_DEBOUNCE_MS } from "backend/utils/db";
 import { TFile, Vault } from "obsidian";
 import { addMarkdown, createCollection, deleteMarkdown, updateMarkdown } from "./db";
-import { injectBacklinks } from "./back-link";
 
 export async function drainOfflineQueue(vault: Vault): Promise<void> {
     const queue = loadQueue();
