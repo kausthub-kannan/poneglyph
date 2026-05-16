@@ -78,7 +78,9 @@ const context = await esbuild.context({
 		"process.env.LANGSMITH_PROJECT": JSON.stringify(process.env.LANGSMITH_PROJECT),
 		"process.env.LANGSMITH_ENDPOINT": JSON.stringify(process.env.LANGSMITH_ENDPOINT),
 
-		"process.env.LANGSMITH_DISABLE_RUN_COMPRESSION": JSON.stringify(process.env.LANGSMITH_DISABLE_RUN_COMPRESSION)
+		"process.env.LANGSMITH_DISABLE_RUN_COMPRESSION": JSON.stringify(process.env.LANGSMITH_DISABLE_RUN_COMPRESSION),
+
+		"process.env.EMAIL": JSON.stringify(process.env.EMAIL),
 	},
 
 });

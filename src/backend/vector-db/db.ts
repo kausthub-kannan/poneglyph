@@ -23,28 +23,28 @@ const drain = () => {
   }
 };
 
-// (globalThis as any).fetch = async (url: string, init?: RequestInit) => {
-//   return enqueue(async () => {
-//     const response = await requestUrl({
-//       url,
-//       method: init?.method || "GET",
-//       headers: (init?.headers as Record<string, string>) ?? {},
-//       body: init?.body as string,
-//       throw: false,
-//     });
+(globalThis as any).fetch = async (url: string, init?: RequestInit) => {
+  return enqueue(async () => {
+    const response = await requestUrl({
+      url,
+      method: init?.method || "GET",
+      headers: (init?.headers as Record<string, string>) ?? {},
+      body: init?.body as string,
+      throw: false,
+    });
 
-//     const makeResponse = () => ({
-//       ok: response.status >= 200 && response.status < 300,
-//       status: response.status,
-//       headers: new Headers(response.headers),
-//       json: async () => response.json,
-//       text: async () => response.text,
-//       clone: () => makeResponse(),
-//     });
+    const makeResponse = () => ({
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      headers: new Headers(response.headers),
+      json: async () => response.json,
+      text: async () => response.text,
+      clone: () => makeResponse(),
+    });
 
-//     return makeResponse();
-//   });
-// };
+    return makeResponse();
+  });
+};
 
 const MAX_CHUNK_CHARS = 8000;
 const CHUNK_OVERLAP_CHARS = 200;
