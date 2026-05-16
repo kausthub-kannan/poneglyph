@@ -1,5 +1,9 @@
+import { App } from 'obsidian';
 import 'pdfjs-dist/build/pdf.worker.mjs'
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+
+export const IDEA_MD_TEMPLATE = `> [!NOTE] How To Use
+> IDEA.md is the place where you store your ideas, research questions, and other thoughts. When you have an idea for a research paper, you can create a new markdown file in the same directory and link it to this file. The more robust IDEA.md is the more robust research will be which would lead to more robust knowledge base.\n>\n`
 
 export function getPdfUrlFromWebView(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -77,4 +81,19 @@ export async function pdfToText(buffer: ArrayBuffer): Promise<string> {
         )
     );
     return pages.join("\n");
+}
+
+export async function setupMarkdowns(app: App) {
+    const ideaPath = 'IDEA.md';
+    const sourcesPath = 'SOURCES.md';
+
+    if (!app.vault.getAbstractFileByPath(ideaPath)) {
+        await app.vault.create(ideaPath, IDEA_MD_TEMPLATE);
+    }
+    
+    if (!app.vault.getAbstractFileByPath(sourcesPath)) {
+        const sourcesContent = `> [!ABSTRACT] Central Citation Source
+> Here is where you would find all the cited academic papers or books which has been used throught the knowledge base. This can be used fro quick reference creation in your papers or for other purposes.  \n\n| Paper Title | DOI | Avg h-index | Avg i10-index | Avg Citedness | Year |\n|---|---|---|---|---|---|\n`;
+        await app.vault.create(sourcesPath, sourcesContent);
+    }
 }

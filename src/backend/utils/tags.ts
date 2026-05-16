@@ -1,12 +1,12 @@
 import { Vault } from 'obsidian';
 
 const FIXED_GROUPS = [
-  { tag: "#draft",      hex: "eab308" }, // Yellow
-  { tag: "#researched", hex: "3b82f6" }, // Blue
-  { tag: "#verified",   hex: "22c55e" }, // Green
+  { tag: "draft",      hex: "eab308", alpha: 0.6 },
+  { tag: "researched", hex: "3b82f6", alpha: 0.75 },
+  { tag: "verified",   hex: "22c55e", alpha: 0.75 },
 ];
 
-export async function injectGraphColors(vault: Vault) {
+export async function configureGraphSettings(vault: Vault) {
     const adapter = vault.adapter;
     const path = `${vault.configDir}/graph.json`;
     if (!await adapter.exists(path)) return;
@@ -17,20 +17,25 @@ export async function injectGraphColors(vault: Vault) {
         const existing = new Set(groups.map((g: any) => g.query));
 
         let changed = false;
-        for (const { tag, hex } of FIXED_GROUPS) {
+        for (const { tag, hex, alpha } of FIXED_GROUPS) {
             if (!existing.has(tag)) {
-                groups.push({ query: tag, color: { a: 1, rgb: parseInt(hex, 16) } });
+                groups.push({ query: tag, color: { a: alpha, rgb: parseInt(hex, 16) } });
                 changed = true;
             }
         }
-//
+        const exclusions = "-file:IDEA.md -file:SOURCES.md";
+        let search = settings.search || "";
+        if (!search.includes("IDEA.md") && !search.includes("SOURCES.md")) {
+            settings.search = search ? `${search} ${exclusions}` : exclusions;
+            changed = true;
+        }
+
         if (changed) {
             settings.colorGroups = groups;
-            console.log(settings);
             await adapter.write(path, JSON.stringify(settings, null, 2));
-            console.log("Poneglyph: Graph colors updated.");
+            console.log("Poneglyph: Graph settings updated.");
         } else {
-            console.log("Poneglyph: All tag groups already exist, no changes made.");
+            console.log("Poneglyph: Graph settings already up to date, no changes made.");
         }
     } catch (e) {
         console.error("Poneglyph: Failed to update graph settings", e);

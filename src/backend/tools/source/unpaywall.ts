@@ -31,12 +31,22 @@ export const createUnpaywallTool = (email: string) => {
           return `The paper with DOI "${doi}" is not open access according to Unpaywall.`;
         }
 
-        let pdfUrl = data.best_oa_location?.url_for_pdf;
+        const extractPdfUrl = (loc: any): string | null => {
+          if (loc?.url_for_pdf) return loc.url_for_pdf;
+          if (loc?.url && loc.url.endsWith(".pdf")) return loc.url;
+          if (loc?.url_for_landing_page && loc.url_for_landing_page.endsWith(".pdf")) return loc.url_for_landing_page;
+          return null;
+        };
+
+        let pdfUrl = extractPdfUrl(data.best_oa_location);
         
         if (!pdfUrl && data.oa_locations && data.oa_locations.length > 0) {
-          const pdfLocation = data.oa_locations.find((loc: any) => loc.url_for_pdf);
-          if (pdfLocation) {
-            pdfUrl = pdfLocation.url_for_pdf;
+          for (const loc of data.oa_locations) {
+            const url = extractPdfUrl(loc);
+            if (url) {
+              pdfUrl = url;
+              break;
+            }
           }
         }
 

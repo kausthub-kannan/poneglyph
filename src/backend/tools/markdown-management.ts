@@ -39,7 +39,7 @@ export const readMarkdownTool = new DynamicStructuredTool({
 
 export const writeMarkdownTool = new DynamicStructuredTool({
     name: "write_markdown",
-    description: "Writes content to a markdown file. Overwrites if it exists, creates new if it doesn't.",
+    description: "Writes content to a markdown file. Overwrites if it exists, creates new if it doesn't. Never start the path with a '/'",
     schema: z.object({
         path: z.string().describe("The exact path of the markdown file, e.g., 'folder/file.md'"),
         content: z.string().describe("The full markdown content to write")
