@@ -1,23 +1,39 @@
-import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatMistralAI } from "@langchain/mistralai";
-import { ChatOllama } from "@langchain/ollama";
-import { ChatOpenAI } from "@langchain/openai";
+import { HTTPClient } from "@mistralai/mistralai";
+import { requestUrl } from "obsidian";
 import type { GraphQuerySettings } from "settings";
 
-const modelDirectory = {
-    "mistral": ChatMistralAI,
-    "anthropic": ChatAnthropic,
-    "ollama": ChatOllama,
-    "openai": ChatOpenAI
+export const modelDirectory = {
+    "mistral": ChatMistralAI
 } as const;
 
 type SupportedProvider = keyof typeof modelDirectory;
+
+const obsidianHttpClient = new HTTPClient({
+    fetcher: async (request: Request) => {
+        const headers: Record<string, string> = {};
+        request.headers.forEach((value, key) => {
+            headers[key] = value;
+        });
+
+        const response = await requestUrl({
+            url: request.url,
+            method: request.method,
+            headers: headers,
+            body: request.body ? await new Response(request.body).text() : undefined,
+        });
+
+        return new Response(response.text, {
+            status: response.status,
+            headers: response.headers,
+        });
+    }
+});
 
 const getModel = (
     settings: GraphQuerySettings,
     temperature = 0.2
 ) => {
-    // 3. Cast the provider or check if it's valid
     const provider = settings.modelProvider as SupportedProvider;
     const ModelClass = modelDirectory[provider];
 
@@ -25,18 +41,13 @@ const getModel = (
         throw new Error(`Provider "${settings.modelProvider}" is not supported.`);
     }
 
-    const ModelConstructor = ModelClass as any;
-    
-    const config: Record<string, any> = {
+    // @ts-ignore
+    return new ModelClass({
         model: settings.modelID,
         temperature: temperature,
-    };
-
-    if (settings.modelAPIKey) {
-        config.apiKey = settings.modelAPIKey;
-    }
-
-    return new ModelConstructor(config);
+        apiKey: settings.modelAPIKey,
+        httpClient: obsidianHttpClient,
+    });
 };
 
-export { getModel, modelDirectory };
+export { getModel };

@@ -26,7 +26,6 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'start-deep-research',
         name: 'Start Deep Research',
         callback: async () => {
-            console.log('[DEBUG] Command triggered at', new Date().toISOString());
             const file = plugin.app.vault.getFiles().find((f: TFile) => f.name === 'IDEA.md');
             if (!file) {
                 new Notice('IDEA.md not found in the vault.');

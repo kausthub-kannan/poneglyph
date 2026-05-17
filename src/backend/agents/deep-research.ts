@@ -1,3 +1,18 @@
+(globalThis as any).Bun = {};
+
+if (typeof process !== "undefined" && process.env) {
+  Object.assign(process.env, {
+    LANGSMITH_TRACING: process.env.LANGSMITH_TRACING,
+    LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
+    LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
+    LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
+
+    LANGSMITH_DISABLE_RUN_COMPRESSION: process.env.LANGSMITH_DISABLE_RUN_COMPRESSION,
+    LANGSMITH_MULTIPART_STREAMING_DISABLED: "true"
+  });
+}
+
+
 import { createDeepAgent, createSkillsMiddleware, } from "deepagents";
 import { sciHubFullTextTool } from "backend/tools/source/scihub";
 import { arxivFullTextTool } from "backend/tools/source/arxiv";
@@ -15,17 +30,6 @@ import { updateStatusTool } from "backend/tools/update-status";
 import { generateQueries } from "./query-generation";
 let activeAgentController: AbortController | null = null;
 let agentRunning = false;
-
-if (typeof process !== "undefined" && process.env) {
-  Object.assign(process.env, {
-    LANGSMITH_TRACING: process.env.LANGSMITH_TRACING,
-    LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
-    LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
-    LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
-
-    LANGSMITH_DISABLE_RUN_COMPRESSION: process.env.LANGSMITH_DISABLE_RUN_COMPRESSION,
-  });
-}
 
 async function deepResearch(
   app: App,
@@ -57,6 +61,8 @@ async function deepResearch(
 
   try {
     const queries = await generateQueries(ideaText, settings);
+    console.log("[QUERIES GENERATED]:", queries);
+
     const result = await agent.invoke({
       messages: [{ role: "user", content: userPrompt.replace("{{query}}", queries) }],
       files: virtualFileSystem,
@@ -65,6 +71,7 @@ async function deepResearch(
     });
 
     const finalMessage = result.messages[result.messages.length - 1];
+    console.log("[AGENT FINAL MESSAGE]", finalMessage);
     if (!finalMessage) throw new Error("Agent returned no messages.");
 
     return typeof finalMessage.content === "string"

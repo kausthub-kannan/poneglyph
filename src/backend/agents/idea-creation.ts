@@ -12,7 +12,6 @@ export async function createIdea(existingData: string, settings: GraphQuerySetti
     ];
 
     const response = await model.invoke(messages);
-    console.log("response", response)
 
     return typeof response.content === "string" ? response.content : JSON.stringify(response.content);
 }

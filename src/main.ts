@@ -14,7 +14,6 @@ export default class GraphQueryPlugin extends Plugin {
     settings: GraphQuerySettings;
 
     async onload() {
-        console.log(100)
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
         this.app.workspace.onLayoutReady(() => configureGraphSettings(this.app.vault));
         this.addSettingTab(new GraphQuerySettingTab(this.app, this));

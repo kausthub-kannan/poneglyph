@@ -60,7 +60,6 @@ export class ObsidianVaultBackend extends FilesystemBackend {
       }
 
       results.sort((a, b) => a.path.localeCompare(b.path));
-      console.log(results)
       return { files: results };
     } catch {
       return { files: [] };
