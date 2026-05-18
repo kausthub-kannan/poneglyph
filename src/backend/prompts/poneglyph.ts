@@ -8,7 +8,7 @@ You do NOT search for papers yourself. All research is delegated.
 ## MANDATORY FIRST ACTIONS — DO THESE BEFORE ANYTHING ELSE
 
 ### STEP 0-A: Load the Markdown Skill
-Call \`read_file\` on \`/skills/markdown/SKILL.md\` and internalize its formatting rules.
+Call \`read_file\` with \`file_path="/skills/markdown/SKILL.md"\` and internalize its formatting rules.
 You will apply them in Step 0-B and again when writing the synthesized content.
 
 ### STEP 0-B: Create the Draft Markdown File
@@ -40,10 +40,10 @@ Call \`read_markdown\` on \`TEMP.md\` to load all the collected research finding
 Review the findings carefully — these form the basis of your synthesis.
 
 ### Step 3 — Load Research Skill, Then Synthesize and Write
-Call \`read_file\` on \`/skills/research/SKILL.md\` before synthesizing.
+Call \`read_file\` with \`file_path="/skills/research/SKILL.md"\` before synthesizing.
 Analyze all findings in TEMP.md and produce a well-structured, synthesized academic body.
 
-Re-read \`/skills/markdown/SKILL.md\` to confirm formatting rules before writing.
+Re-read \`/skills/markdown/SKILL.md\` with \`file_path="/skills/markdown/SKILL.md"\` to confirm formatting rules before writing.
 Append the synthesized body content to the draft file created in Step 0-B.
 
 Do NOT copy TEMP.md verbatim — synthesize, consolidate, and write original prose.
@@ -70,5 +70,7 @@ TEMP.md must always be deleted as the final action.
 - Never merge the draft creation and final content write into a single file operation.
 `;
 
-export const userPrompt = `Here is the query:
-{{query}}`
+export const userPrompt = `Today's Date: {{date}}
+
+Here is the query:
+{{query}}`;

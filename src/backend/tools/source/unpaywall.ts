@@ -1,7 +1,7 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 import { requestUrl } from "obsidian";
-import { pdfToText } from "backend/utils/helper";
+import { extractTextFromPdfUrl } from "backend/utils/helper";
 
 export const createUnpaywallTool = (email: string) => {
   return new DynamicStructuredTool({
@@ -56,12 +56,7 @@ export const createUnpaywallTool = (email: string) => {
 
         console.log(`Downloading PDF from: ${pdfUrl}`);
         
-        const HEADERS = {
-          "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:27.0) Gecko/20100101 Firefox/27.0",
-        };
-        
-        const pdfResponse = await requestUrl({ url: pdfUrl, headers: HEADERS });
-        const text = await pdfToText(pdfResponse.arrayBuffer);
+        const text = await extractTextFromPdfUrl(pdfUrl);
         
         if (!text.trim()) {
           return `Failed to extract text from the PDF for DOI "${doi}".`;

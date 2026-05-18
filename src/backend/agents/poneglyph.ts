@@ -23,11 +23,13 @@ import {
 } from "backend/tools/markdown-management";
 import { addSourceTool } from "backend/tools/add-source";
 import { updateStatusTool } from "backend/tools/update-status";
-import { App } from "obsidian";
+import { App, TFile } from "obsidian";
 import { loadSkills } from "backend/utils/load-skills";
 import { ObsidianVaultBackend } from "backend/utils/obsidian-backend";
 import { generateQueries } from "./query-generation";
 import { createDeepResearchSubAgent } from "./deep-reserach";
+import { injectBacklinks } from "backend/vector-db/back-link";
+import { getChromaClient } from "backend/utils/db";
 
 let activeAgentController: AbortController | null = null;
 let agentRunning = false;
@@ -59,6 +61,22 @@ async function deepResearch(
   activeAgentController = new AbortController();
   agentRunning = true;
 
+  // Track the research note file created by the agent (excludes TEMP.md / SOURCES.md)
+  let generatedFilePath: string | null = null;
+
+  // Wrap writeMarkdownTool to capture the path of the main research note
+  const originalWriteFunc = (writeMarkdownTool as any).func;
+  (writeMarkdownTool as any).func = async (args: { path: string; content: string }) => {
+    const result = await originalWriteFunc(args);
+    const normalizedPath = args.path.endsWith('.md') ? args.path : `${args.path}.md`;
+    const isSystemFile = ["TEMP.md", "SOURCES.md"].includes(normalizedPath);
+    if (!isSystemFile) {
+      generatedFilePath = normalizedPath;
+      console.log("[PONEGLYPH] Tracking generated file:", generatedFilePath);
+    }
+    return result;
+  };
+
   // Coordinator: markdown management tools only — no search or source tools
   const markdownTools = [
     readMarkdownTool,
@@ -89,8 +107,11 @@ async function deepResearch(
     const queries = await generateQueries(ideaText, settings);
     console.log("[QUERIES GENERATED]:", queries);
 
+    const now = new Date();
+    const currentDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+
     const result = await agent.invoke({
-      messages: [{ role: "user", content: userPrompt.replace("{{query}}", queries) }],
+      messages: [{ role: "user", content: userPrompt.replace("{{query}}", queries).replace("{{date}}", currentDate) }],
       files: virtualFileSystem,
     }, {
       signal: activeAgentController.signal
@@ -99,6 +120,31 @@ async function deepResearch(
     const finalMessage = result.messages[result.messages.length - 1];
     console.log("[COORDINATOR FINAL MESSAGE]", finalMessage);
     if (!finalMessage) throw new Error("Agent returned no messages.");
+
+    // Inject backlinks into the generated research note
+    if (generatedFilePath) {
+      try {
+        console.log("[PONEGLYPH] Injecting backlinks into:", generatedFilePath);
+        const chromaClient = await getChromaClient();
+        if (chromaClient) {
+          const file = app.vault.getAbstractFileByPath(generatedFilePath);
+          if (file instanceof TFile) {
+            const content = await app.vault.read(file);
+            const updatedContent = await injectBacklinks(chromaClient, content, file.name);
+            if (updatedContent !== content) {
+              await app.vault.modify(file, updatedContent);
+              console.log("[PONEGLYPH] Backlinks injected successfully.");
+            } else {
+              console.log("[PONEGLYPH] No relevant backlinks found.");
+            }
+          }
+        } else {
+          console.warn("[PONEGLYPH] ChromaDB unavailable – skipping backlink injection.");
+        }
+      } catch (backlinkError) {
+        console.warn("[PONEGLYPH] Backlink injection failed (non-fatal):", backlinkError);
+      }
+    }
 
     return typeof finalMessage.content === "string"
       ? finalMessage.content
@@ -113,6 +159,8 @@ async function deepResearch(
     throw error;
 
   } finally {
+    // Restore the original writeMarkdownTool func in case it's reused
+    (writeMarkdownTool as any).func = originalWriteFunc;
     agentRunning = false;
     activeAgentController = null;
   }

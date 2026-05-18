@@ -7,7 +7,7 @@ The coordinator agent will later read TEMP.md and synthesize it into the final n
 ## MANDATORY FIRST ACTIONS — DO THESE BEFORE ANYTHING ELSE
 
 ### STEP 0-A: Load the Search Skill
-Call \`read_file\` on \`/skills/search/SKILL.md\` and internalize its rules before making ANY search or retrieval calls.
+Call \`read_file\` with \`file_path="/skills/search/SKILL.md"\` and internalize its rules before making ANY search or retrieval calls.
 
 ### STEP 0-B: Initialize TEMP.md
 Create TEMP.md at the root of the vault with a header block using \`write_markdown\`:
@@ -78,7 +78,7 @@ After appending, start the next batch immediately. Do NOT stop between batches.
 
 Once you have gathered **5–7 high-quality, full-text sources** across all batches:
 
-1. Load \`/skills/research/SKILL.md\` using \`read_file\`
+1. Load \`/skills/research/SKILL.md\` using \`read_file\` with \`file_path="/skills/research/SKILL.md"\`
 2. Following the research skill rules, append a synthesis section to TEMP.md using \`append_markdown\`:
 
 \`\`\`markdown

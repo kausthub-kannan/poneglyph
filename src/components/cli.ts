@@ -4,6 +4,7 @@ import { deepResearch, stopDeepResearch } from 'backend/agents/poneglyph';
 import { IDEA_MD_TEMPLATE } from 'backend/utils/helper';
 import { ChromaClient } from 'chromadb-client';
 import { injectBacklinks } from 'backend/vector-db/back-link';
+import { createIdeas } from 'backend/agents/idea-creation';
 
 const LOADING_BAR_BLOCK = `<div style="text-align:center;">\n<i>Agent in progress...</i>\n<progress value="100" max="100" style="width:100%; height:6px; accent-color:var(--color-accent);"></progress>\n</div>\n`;
 
@@ -39,6 +40,8 @@ export function registerCommands(plugin: GraphideaPlugin) {
 
             new Notice('Starting Deep Research...');
             await injectLoadingBar(plugin, file);
+            plugin.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
+            plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent in Progress');
 
             try {
                 const cleansedIdea = idea.replace(IDEA_MD_TEMPLATE, '');
@@ -49,6 +52,8 @@ export function registerCommands(plugin: GraphideaPlugin) {
                 new Notice(error instanceof Error ? error.message : String(error));
             } finally {
                 await removeLoadingBar(plugin, file);
+                plugin.agentStatusBarItem.style.color = 'var(--color-green, green)';
+                plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent Idle');
             }
         }
     });
@@ -63,6 +68,8 @@ export function registerCommands(plugin: GraphideaPlugin) {
             if (file) {
                 await removeLoadingBar(plugin, file);
             }
+            plugin.agentStatusBarItem.style.color = 'var(--color-green, green)';
+            plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent Idle');
         }
     });
     plugin.addCommand({
@@ -92,6 +99,29 @@ export function registerCommands(plugin: GraphideaPlugin) {
             } catch (error) {
                 new Notice('Failed to inject backlinks.');
                 console.error(error);
+            }
+        }
+    });
+
+    plugin.addCommand({
+        id: 'start-idea-creation',
+        name: 'Generate Thesis',
+        callback: async () => {
+            new Notice('Starting Idea Creation...');
+            plugin.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
+            plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent in Progress');
+
+            try {
+                await createIdeas(plugin.app, plugin.settings, (index, total, title) => {
+                    new Notice(`Processing Idea (${index}/${total}): ${title}`);
+                });
+                new Notice('Idea Creation finished. Check THESIS.md');
+            } catch (error) {
+                console.error(error);
+                new Notice(error instanceof Error ? error.message : String(error));
+            } finally {
+                plugin.agentStatusBarItem.style.color = 'var(--color-green, green)';
+                plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent Idle');
             }
         }
     });

@@ -1,6 +1,6 @@
 import { Plugin, TFile, addIcon, setIcon } from 'obsidian';
 
-const TARGET_FILES = ['IDEA', 'DRAFT', 'SOURCES'];
+const TARGET_FILES = ['IDEA', 'TEMP', 'SOURCES', 'THESIS'];
 
 export function setupFileExplorerIcons(plugin: Plugin) {
     addIcon('poneglyph-symbol', `<text x="50" y="80" font-size="80" text-anchor="middle" fill="var(--color-accent)" font-weight="900">𓂀</text>`);

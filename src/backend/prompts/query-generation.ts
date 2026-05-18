@@ -35,7 +35,7 @@ Return a JSON object with the following structure — no preamble, no markdown f
 }
 
 Use category "existing" for queries that were already present in the input text.
-Aim for maximum 4 queries unless the content gievn for the topic.
+Generate exactly 4 queries — no more, no fewer. Prioritize the most distinct and impactful angles.
 `
 
 export const userPrompt = `Here is the text from IDEA.md from which set of queries has to be generated.

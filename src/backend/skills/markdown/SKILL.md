@@ -53,10 +53,8 @@ Use tags consistently. A note can have multiple tags from different categories.
 | Category | Tags |
 |---|---|
 | Status | `draft`, `researched` |
-| Type | `research`, `location`, `faction`, `timeline`, `concept` |
+| Topic | 3-5 tags suitable for the topic based on the markdown content|
 | Priority | `core`, `supporting` |
-
-**Never invent one-off tags.** If a new category is genuinely needed, add it to this table first.
 
 
 ## 3. Content Structure
@@ -89,15 +87,13 @@ Every factual claim should be traceable. At the bottom of the note, include:
 - [Paper Title](https://doi.org/or-url) — brief note on what this source covers.
 ```
 
-### Internal Links
-Add title names of the initially given or obtained parent/similar existing markdowns in the vault. You can *omit this* if the parent titles were not given
+**Note**:
+When citing a source within the content or adding any links to in the whole markdown always follow:
 
 ```markdown
-#### Parent Nodes
-
-1. [[Parent Note 1 Title]]
-2. [[Parent Note 2 Title]]
+[Source Name or Paper Name or author's name](url) strcuture
 ```
+DO NOT use `[[<markdown name>]](url)`
 
 ## 4. Finalization Checklist
 
