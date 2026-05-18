@@ -1,6 +1,6 @@
 import { Notice, TFile } from 'obsidian';
 import GraphideaPlugin from '../main';
-import { deepResearch, stopDeepResearch } from 'backend/agents/deep-research';
+import { deepResearch, stopDeepResearch } from 'backend/agents/poneglyph';
 import { IDEA_MD_TEMPLATE } from 'backend/utils/helper';
 import { ChromaClient } from 'chromadb-client';
 import { injectBacklinks } from 'backend/vector-db/back-link';

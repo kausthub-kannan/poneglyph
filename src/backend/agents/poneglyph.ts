@@ -6,31 +6,47 @@ if (typeof process !== "undefined" && process.env) {
     LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
     LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
     LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
-
     LANGSMITH_DISABLE_RUN_COMPRESSION: process.env.LANGSMITH_DISABLE_RUN_COMPRESSION,
     LANGSMITH_MULTIPART_STREAMING_DISABLED: "true"
   });
 }
 
-
-import { createDeepAgent, createSkillsMiddleware, } from "deepagents";
-import { sciHubFullTextTool } from "backend/tools/source/scihub";
-import { arxivFullTextTool } from "backend/tools/source/arxiv";
-import { createUnpaywallTool } from "backend/tools/source/unpaywall";
-import { systemPrompt, userPrompt } from "backend/prompts/deep-reserach";
+import { createDeepAgent, createSkillsMiddleware } from "deepagents";
+import { systemPrompt, userPrompt } from "backend/prompts/poneglyph";
 import { getModel } from "backend/utils/model-provider";
 import { GraphQuerySettings } from "settings";
-import { appendMarkdownTool, readMarkdownTool, writeMarkdownTool } from "backend/tools/markdown-management";
-import { openAlexSearchTool } from "backend/tools/search/open-alex";
+import {
+  readMarkdownTool,
+  writeMarkdownTool,
+  appendMarkdownTool,
+  deleteTempMarkdownTool
+} from "backend/tools/markdown-management";
+import { addSourceTool } from "backend/tools/add-source";
+import { updateStatusTool } from "backend/tools/update-status";
 import { App } from "obsidian";
 import { loadSkills } from "backend/utils/load-skills";
 import { ObsidianVaultBackend } from "backend/utils/obsidian-backend";
-import { addSourceTool } from "backend/tools/add-source";
-import { updateStatusTool } from "backend/tools/update-status";
 import { generateQueries } from "./query-generation";
+import { createDeepResearchSubAgent } from "./deep-reserach";
+
 let activeAgentController: AbortController | null = null;
 let agentRunning = false;
 
+/**
+ * Coordinator agent for the Poneglyph research pipeline.
+ *
+ * Responsibilities:
+ *  - Create the draft markdown note (frontmatter only)
+ *  - Delegate all paper search & retrieval to the deep-research subagent
+ *  - Read TEMP.md after the subagent completes
+ *  - Synthesize findings into a polished academic body and append to the draft
+ *  - Update note status: draft → researched
+ *  - Record all cited sources in SOURCES.md
+ *  - Delete TEMP.md as the final cleanup step
+ *
+ * The coordinator has NO access to search or source retrieval tools.
+ * All research is delegated to the deep-research subagent.
+ */
 async function deepResearch(
   app: App,
   ideaText: string,
@@ -43,14 +59,24 @@ async function deepResearch(
   activeAgentController = new AbortController();
   agentRunning = true;
 
-  const sourceTextTools = [sciHubFullTextTool, arxivFullTextTool, createUnpaywallTool(settings.email)]
-  const searchTools = [openAlexSearchTool]
-  const markdownTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool, addSourceTool, updateStatusTool]
+  // Coordinator: markdown management tools only — no search or source tools
+  const markdownTools = [
+    readMarkdownTool,
+    writeMarkdownTool,
+    appendMarkdownTool,
+    addSourceTool,
+    updateStatusTool,
+    deleteTempMarkdownTool
+  ];
+
+  // Deep-research subagent handles all paper searching, retrieval, and TEMP.md output
+  const deepResearchSubAgent = createDeepResearchSubAgent(app, settings);
 
   const agent = createDeepAgent({
     model: llm,
-    tools: [...searchTools, ...sourceTextTools, ...markdownTools],
+    tools: markdownTools,
     systemPrompt: systemPrompt,
+    subagents: [deepResearchSubAgent],
     middleware: [
       createSkillsMiddleware({
         backend: new ObsidianVaultBackend(app),
@@ -71,7 +97,7 @@ async function deepResearch(
     });
 
     const finalMessage = result.messages[result.messages.length - 1];
-    console.log("[AGENT FINAL MESSAGE]", finalMessage);
+    console.log("[COORDINATOR FINAL MESSAGE]", finalMessage);
     if (!finalMessage) throw new Error("Agent returned no messages.");
 
     return typeof finalMessage.content === "string"

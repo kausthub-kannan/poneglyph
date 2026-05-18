@@ -1,6 +1,6 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
-import { App, TFile, TFolder } from "obsidian";
+import { App, TFile, TFolder, Notice } from "obsidian";
 
 declare const app: App;
 
@@ -85,4 +85,23 @@ export const appendMarkdownTool = new DynamicStructuredTool({
     }
 });
 
-export const obsidianTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool];
+export const deleteTempMarkdownTool = new DynamicStructuredTool({
+    name: "delete_temp_markdown",
+    description: "Deletes the temporary TEMP.md file from the Obsidian vault. Call this as the final cleanup step after all research findings have been synthesized and sources have been recorded.",
+    schema: z.object({}),
+    func: async () => {
+        try {
+            const tempPath = "TEMP.md";
+            const file = app.vault.getAbstractFileByPath(tempPath);
+            if (!file) return `Error: TEMP.md not found at path: ${tempPath}`;
+            if (!(file instanceof TFile)) return `Error: TEMP.md is not a valid file.`;
+            await app.vault.trash(file, true);
+            new Notice("TEMP.md cleaned up successfully.");
+            return `Successfully deleted TEMP.md`;
+        } catch (error) {
+            return `Error deleting TEMP.md: ${(error as Error).message}`;
+        }
+    }
+});
+
+export const obsidianTools = [readMarkdownTool, writeMarkdownTool, appendMarkdownTool, deleteTempMarkdownTool];

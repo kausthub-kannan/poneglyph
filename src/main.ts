@@ -2,7 +2,7 @@ import { Plugin, TFile } from 'obsidian';
 import { GraphQuerySettings, DEFAULT_SETTINGS, GraphQuerySettingTab } from './settings';
 import { configureGraphSettings } from 'backend/utils/tags';
 import { registerCommands, removeLoadingBar } from './components/cli';
-import { stopDeepResearch } from './backend/agents/deep-research';
+import { stopDeepResearch } from './backend/agents/poneglyph';
 import { setupFileExplorerIcons } from './components/file-explorer';
 import { setupMarkdowns } from 'backend/utils/helper';
 import { drainOfflineQueue, onFileCreated, onFileDeleted, onFileModified } from 'backend/vector-db/file-listeners';
@@ -20,7 +20,7 @@ export default class GraphQueryPlugin extends Plugin {
         setupMarkdowns(this.app);
         registerCommands(this);
         setupFileExplorerIcons(this);
-        
+
         // await drainOfflineQueue(this.app.vault);
         // await indexVault(this.app.vault);
 
