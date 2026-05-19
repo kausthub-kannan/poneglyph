@@ -9,7 +9,7 @@ const FIXED_GROUPS = [
 export async function configureGraphSettings(vault: Vault) {
     const adapter = vault.adapter;
     const path = `${vault.configDir}/graph.json`;
-    if (!await adapter.exists(path)) return;
+    if (!(await adapter.exists(path))) return;
 
     try {
         const settings = JSON.parse(await adapter.read(path));
@@ -24,7 +24,7 @@ export async function configureGraphSettings(vault: Vault) {
             }
         }
         const exclusions = "-file:IDEA.md -file:SOURCES.md";
-        let search = settings.search || "";
+        const search = settings.search || "";
         if (!search.includes("IDEA.md") && !search.includes("SOURCES.md")) {
             settings.search = search ? `${search} ${exclusions}` : exclusions;
             changed = true;
@@ -33,11 +33,6 @@ export async function configureGraphSettings(vault: Vault) {
         if (changed) {
             settings.colorGroups = groups;
             await adapter.write(path, JSON.stringify(settings, null, 2));
-            console.log("Poneglyph: Graph settings updated.");
-        } else {
-            console.log("Poneglyph: Graph settings already up to date, no changes made.");
         }
-    } catch (e) {
-        console.error("Poneglyph: Failed to update graph settings", e);
-    }
+    } catch { /* ignore */ }
 }

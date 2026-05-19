@@ -7,14 +7,14 @@ import { setupFileExplorerIcons } from './components/file-explorer';
 import { setupMarkdowns } from 'backend/utils/helper';
 import { drainOfflineQueue, onFileCreated, onFileDeleted, onFileModified } from 'backend/vector-db/file-listeners';
 import { indexVault } from 'backend/vector-db/auto-index';
-
-// Add this to see the exact request being mad
+import setupVariables from 'backend/utils/setup';
 
 export default class GraphQueryPlugin extends Plugin {
     settings: GraphQuerySettings;
     agentStatusBarItem: HTMLElement;
 
     async onload() {
+        setupVariables();
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
         this.app.workspace.onLayoutReady(() => configureGraphSettings(this.app.vault));
         this.addSettingTab(new GraphQuerySettingTab(this.app, this));

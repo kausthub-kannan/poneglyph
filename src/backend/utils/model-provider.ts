@@ -41,7 +41,7 @@ const getModel = (
         throw new Error(`Provider "${settings.modelProvider}" is not supported.`);
     }
 
-    // @ts-ignore
+    // @ts-expect-error dynamic class instantiation
     return new ModelClass({
         model: settings.modelID,
         temperature: temperature,

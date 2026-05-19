@@ -87,8 +87,6 @@ export class ObsidianVaultBackend extends FilesystemBackend {
         };
       }
 
-      console.log(content)
-
       return {
         content: lines.slice(offset, offset + limit).join("\n"),
         mimeType: "text/markdown",
@@ -129,7 +127,7 @@ export class ObsidianVaultBackend extends FilesystemBackend {
 
         responses.push({ path: filePath, content: content as any, error: null });
 
-      } catch (e: any) {
+      } catch {
         responses.push({
           path: filePath,
           content: null,

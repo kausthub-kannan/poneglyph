@@ -1,12 +1,10 @@
 import { Notice, TFile } from 'obsidian';
 import GraphideaPlugin from '../main';
 import { deepResearch, stopDeepResearch } from 'backend/agents/poneglyph';
-import { IDEA_MD_TEMPLATE } from 'backend/utils/helper';
 import { ChromaClient } from 'chromadb-client';
 import { injectBacklinks } from 'backend/vector-db/back-link';
 import { createIdeas } from 'backend/agents/idea-creation';
-
-const LOADING_BAR_BLOCK = `<div style="text-align:center;">\n<i>Agent in progress...</i>\n<progress value="100" max="100" style="width:100%; height:6px; accent-color:var(--color-accent);"></progress>\n</div>\n`;
+import { IDEA_MD_TEMPLATE, LOADING_BAR_BLOCK } from 'backend/utils/templates';
 
 async function injectLoadingBar(plugin: GraphideaPlugin, file: TFile) {
     const content = await plugin.app.vault.read(file);
@@ -48,7 +46,6 @@ export function registerCommands(plugin: GraphideaPlugin) {
                 await deepResearch(plugin.app, cleansedIdea, plugin.settings);
                 new Notice('Deep Research finished.');
             } catch (error) {
-                console.error(error);
                 new Notice(error instanceof Error ? error.message : String(error));
             } finally {
                 await removeLoadingBar(plugin, file);
@@ -96,9 +93,8 @@ export function registerCommands(plugin: GraphideaPlugin) {
 
                 await plugin.app.vault.modify(file, updatedContent);
                 new Notice('Backlinks injected successfully.');
-            } catch (error) {
+            } catch {
                 new Notice('Failed to inject backlinks.');
-                console.error(error);
             }
         }
     });
@@ -117,7 +113,6 @@ export function registerCommands(plugin: GraphideaPlugin) {
                 });
                 new Notice('Idea Creation finished. Check THESIS.md');
             } catch (error) {
-                console.error(error);
                 new Notice(error instanceof Error ? error.message : String(error));
             } finally {
                 plugin.agentStatusBarItem.style.color = 'var(--color-green, green)';

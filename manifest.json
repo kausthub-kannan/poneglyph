@@ -1,11 +1,10 @@
 {
 	"id": "poneglyph",
 	"name": "Poneglyph",
-	"version": "1.0.0",
+	"version": "0.5.0",
 	"minAppVersion": "0.15.0",
 	"description": "Research Assistant as you second brain!",
 	"author": "kausthub-kannan",
 	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": true
 }

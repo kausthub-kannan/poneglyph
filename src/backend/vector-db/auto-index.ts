@@ -9,7 +9,6 @@ const CHUNK_SIZE = 50;
 export async function indexVault(vault: Vault): Promise<void> {
   const client = await getChromaClient();
   if (!client) {
-    console.warn("[KG] ChromaDB unreachable – skipping vault index.");
     return;
   }
 
@@ -30,7 +29,6 @@ export async function indexVault(vault: Vault): Promise<void> {
   const stalePaths = [...indexedPaths].filter((p) => !vaultPaths.has(p));
 
   if (stalePaths.length) {
-    console.log(`[KG] Removing ${stalePaths.length} deleted files from index…`);
     await batchDeleteMarkdown(client, COLLECTION_NAME, stalePaths);
   }
 
@@ -38,11 +36,8 @@ export async function indexVault(vault: Vault): Promise<void> {
   const missingFiles = vaultFiles.filter((f) => !indexedPaths.has(f.path));
 
   if (!missingFiles.length) {
-    console.log("[KG] Vault already fully indexed.");
     return;
   }
-
-  console.log(`[KG] Batch-indexing ${missingFiles.length} unindexed files…`);
 
   for (let i = 0; i < missingFiles.length; i += CHUNK_SIZE) {
     const batch = missingFiles.slice(i, i + CHUNK_SIZE);
@@ -59,6 +54,4 @@ export async function indexVault(vault: Vault): Promise<void> {
 
     await batchAddMarkdown(client, COLLECTION_NAME, docs, metadatas);
   }
-
-  console.log("[KG] Vault index complete.");
 }

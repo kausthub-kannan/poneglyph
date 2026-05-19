@@ -1,6 +1,6 @@
 import { DynamicStructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
-import { App, Notice, TFile } from "obsidian";
+import { App, TFile } from "obsidian";
 import { ChromaClient } from "chromadb-client";
 import { injectBacklinks } from "backend/vector-db/back-link";
 

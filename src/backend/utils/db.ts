@@ -54,15 +54,13 @@ export async function getChromaClient(): Promise<ChromaClient | null> {
         const client = getClient();
         await client.heartbeat();
         return client;
-    } catch (error) {
-        console.log(error)
-        console.warn("[KG] ChromaDB unreachable – offline operations preserved.");
+    } catch {
         return null;
     }
 }
 
 
-export function buildMetadata(file: TFile, content: string): Record<string, unknown> {
+export function buildMetadata(file: TFile, _content: string): Record<string, unknown> {
     return {
         path: file.path,
         createdAt: file.stat.ctime,

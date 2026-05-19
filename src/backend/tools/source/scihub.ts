@@ -10,20 +10,17 @@ export const sciHubFullTextTool = new DynamicStructuredTool({
     maxChars: z.number().optional().default(120_000),
   }),
 
-  func: async ({ doi, maxChars = 120_000 }) => {
+  func: async ({ doi }) => {
     const mirrors = ["https://sci-hub.mobi"]
     if (!mirrors.length) return "Error: No Sci-Hub mirrors available.";
 
     for (const mirror of mirrors) {
       try {
-        console.log("Attempting to fetch from mirror:", mirror);
         const pdfUrl = await getPdfUrlFromWebView(`${mirror}${doi}`);
         const text = await extractTextFromPdfUrl(pdfUrl);
         if (!text.trim()) continue;
         return text;
-      } catch (err) {
-        console.warn(`[SciHub] ${mirror} failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
+      } catch { /* ignore error */ }
     }
 
     return `Failed to fetch DOI "${doi}" from all available mirrors. Please try fetching a different paper which is similar to this`;

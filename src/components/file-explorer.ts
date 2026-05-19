@@ -8,7 +8,7 @@ export function setupFileExplorerIcons(plugin: Plugin) {
     const updateIcons = () => {
         const fileExplorers = plugin.app.workspace.getLeavesOfType('file-explorer');
         for (const leaf of fileExplorers) {
-            // @ts-ignore
+            // @ts-expect-error internal property
             const fileItems = leaf.view.fileItems;
             if (!fileItems) continue;
 

@@ -1,16 +1,3 @@
-(globalThis as any).Bun = {};
-
-if (typeof process !== "undefined" && process.env) {
-  Object.assign(process.env, {
-    LANGSMITH_TRACING: process.env.LANGSMITH_TRACING,
-    LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
-    LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
-    LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
-    LANGSMITH_DISABLE_RUN_COMPRESSION: process.env.LANGSMITH_DISABLE_RUN_COMPRESSION,
-    LANGSMITH_MULTIPART_STREAMING_DISABLED: "true"
-  });
-}
-
 import { createDeepAgent, createSkillsMiddleware } from "deepagents";
 import { systemPrompt, userPrompt } from "backend/prompts/poneglyph";
 import { getModel } from "backend/utils/model-provider";
@@ -61,10 +48,8 @@ async function deepResearch(
   activeAgentController = new AbortController();
   agentRunning = true;
 
-  // Track the research note file created by the agent (excludes TEMP.md / SOURCES.md)
   let generatedFilePath: string | null = null;
 
-  // Wrap writeMarkdownTool to capture the path of the main research note
   const originalWriteFunc = (writeMarkdownTool as any).func;
   (writeMarkdownTool as any).func = async (args: { path: string; content: string }) => {
     const result = await originalWriteFunc(args);
@@ -72,12 +57,10 @@ async function deepResearch(
     const isSystemFile = ["TEMP.md", "SOURCES.md"].includes(normalizedPath);
     if (!isSystemFile) {
       generatedFilePath = normalizedPath;
-      console.log("[PONEGLYPH] Tracking generated file:", generatedFilePath);
     }
     return result;
   };
 
-  // Coordinator: markdown management tools only — no search or source tools
   const markdownTools = [
     readMarkdownTool,
     writeMarkdownTool,
@@ -87,7 +70,6 @@ async function deepResearch(
     deleteTempMarkdownTool
   ];
 
-  // Deep-research subagent handles all paper searching, retrieval, and TEMP.md output
   const deepResearchSubAgent = createDeepResearchSubAgent(app, settings);
 
   const agent = createDeepAgent({
@@ -105,7 +87,6 @@ async function deepResearch(
 
   try {
     const queries = await generateQueries(ideaText, settings);
-    console.log("[QUERIES GENERATED]:", queries);
 
     const now = new Date();
     const currentDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
@@ -118,13 +99,10 @@ async function deepResearch(
     });
 
     const finalMessage = result.messages[result.messages.length - 1];
-    console.log("[COORDINATOR FINAL MESSAGE]", finalMessage);
     if (!finalMessage) throw new Error("Agent returned no messages.");
 
-    // Inject backlinks into the generated research note
     if (generatedFilePath) {
       try {
-        console.log("[PONEGLYPH] Injecting backlinks into:", generatedFilePath);
         const chromaClient = await getChromaClient();
         if (chromaClient) {
           const file = app.vault.getAbstractFileByPath(generatedFilePath);
@@ -133,33 +111,24 @@ async function deepResearch(
             const updatedContent = await injectBacklinks(chromaClient, content, file.name);
             if (updatedContent !== content) {
               await app.vault.modify(file, updatedContent);
-              console.log("[PONEGLYPH] Backlinks injected successfully.");
-            } else {
-              console.log("[PONEGLYPH] No relevant backlinks found.");
             }
           }
-        } else {
-          console.warn("[PONEGLYPH] ChromaDB unavailable – skipping backlink injection.");
         }
-      } catch (backlinkError) {
-        console.warn("[PONEGLYPH] Backlink injection failed (non-fatal):", backlinkError);
+      } catch {
+        // error ignored
       }
     }
 
     return typeof finalMessage.content === "string"
       ? finalMessage.content
       : JSON.stringify(finalMessage.content, null, 2);
-
   } catch (error: any) {
     if (error.name === "AbortError") {
       return "Research extraction stopped.";
     }
 
-    console.error("Agent encountered an error:", error);
     throw error;
-
   } finally {
-    // Restore the original writeMarkdownTool func in case it's reused
     (writeMarkdownTool as any).func = originalWriteFunc;
     agentRunning = false;
     activeAgentController = null;

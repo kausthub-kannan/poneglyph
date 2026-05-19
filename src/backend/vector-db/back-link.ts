@@ -7,12 +7,9 @@ export async function injectBacklinks(
     content: string,
     selfFilename: string
 ): Promise<string> {
-    console.log("Injecting backlinks...");
     const paths = await getParentMarkdown(client, COLLECTION_NAME, content);
 
     if (!paths?.length) return content;
-
-    console.log("Backlinks found:", paths);
 
     const candidates = paths.filter((path) => path !== selfFilename);
 

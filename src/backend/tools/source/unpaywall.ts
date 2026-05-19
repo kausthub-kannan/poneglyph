@@ -17,16 +17,15 @@ export const createUnpaywallTool = (email: string) => {
 
       try {
         const apiUrl = `https://api.unpaywall.org/v2/${doi}?email=${encodeURIComponent(email)}`;
-        console.log(`Fetching from Unpaywall: ${apiUrl}`);
-        
+
         const response = await requestUrl({ url: apiUrl });
-        
+
         if (response.status !== 200) {
           return `Failed to fetch metadata from Unpaywall for DOI "${doi}". Status: ${response.status}`;
         }
 
         const data = response.json;
-        
+
         if (!data.is_oa) {
           return `The paper with DOI "${doi}" is not open access according to Unpaywall.`;
         }
@@ -39,7 +38,7 @@ export const createUnpaywallTool = (email: string) => {
         };
 
         let pdfUrl = extractPdfUrl(data.best_oa_location);
-        
+
         if (!pdfUrl && data.oa_locations && data.oa_locations.length > 0) {
           for (const loc of data.oa_locations) {
             const url = extractPdfUrl(loc);
@@ -54,17 +53,14 @@ export const createUnpaywallTool = (email: string) => {
           return `Open access version found for DOI "${doi}", but no PDF URL is available.`;
         }
 
-        console.log(`Downloading PDF from: ${pdfUrl}`);
-        
         const text = await extractTextFromPdfUrl(pdfUrl);
-        
+
         if (!text.trim()) {
           return `Failed to extract text from the PDF for DOI "${doi}".`;
         }
-        
+
         return text;
       } catch (err) {
-        console.warn(`[Unpaywall] fetch failed: ${err instanceof Error ? err.message : String(err)}`);
         return `Failed to fetch from Unpaywall for "${doi}": ${err instanceof Error ? err.message : String(err)}`;
       }
     },

@@ -11,24 +11,22 @@ export const arxivFullTextTool = new DynamicStructuredTool({
   func: async ({ doi }) => {
     try {
       let arxivId = doi;
-      
+
       const arxivMatch = doi.match(/arxiv\.([\d.]+.*)/i);
       if (arxivMatch) {
         arxivId = arxivMatch[1] || '';
       }
-      
+
       const pdfUrl = `https://arxiv.org/pdf/${arxivId}.pdf`;
-      console.log(`Attempting to fetch from arxiv: ${pdfUrl}`);
-      
+
       const text = await extractTextFromPdfUrl(pdfUrl);
-      
+
       if (!text.trim()) {
         return `Failed to extract text from arXiv PDF for ${doi}.`;
       }
-      
+
       return text;
     } catch (err) {
-      console.warn(`[ArXiv] fetch failed: ${err instanceof Error ? err.message : String(err)}`);
       return `Failed to fetch from arXiv for "${doi}": ${err instanceof Error ? err.message : String(err)}`;
     }
   },
