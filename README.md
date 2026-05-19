@@ -1,4 +1,4 @@
-# Poneglyph
+# 𓂀 Poneglyph
 **Poneglyph** is a research-first Obsidian plugin that transforms your knowledge graph into a living, cited research artifact — powered by a local deep research agent.
 
 [![Version](https://img.shields.io/badge/version-0.5.2-blue?style=flat-square)](https://github.com/kausthub-kannan/poneglyph/releases)
