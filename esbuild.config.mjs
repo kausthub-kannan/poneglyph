@@ -73,7 +73,7 @@ const context = await esbuild.context({
 		"process.env.MODEL_ID": JSON.stringify(process.env.MODEL_ID) || '',
 		"process.env.MAX_DEPTH": JSON.stringify(process.env.MAX_DEPTH) || '3',
 
-		"process.env.LANGSMITH_TRACING": JSON.stringify(process.env.LANGSMITH_TRACING) || false,
+		"process.env.LANGSMITH_TRACING": JSON.stringify(process.env.LANGSMITH_TRACING) || 'false',
 		"process.env.LANGSMITH_API_KEY": JSON.stringify(process.env.LANGSMITH_API_KEY) || '',
 		"process.env.LANGSMITH_PROJECT": JSON.stringify(process.env.LANGSMITH_PROJECT) || '',
 		"process.env.LANGSMITH_ENDPOINT": JSON.stringify(process.env.LANGSMITH_ENDPOINT) || 'https://api.smith.langchain.com',
