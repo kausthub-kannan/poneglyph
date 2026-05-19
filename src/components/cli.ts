@@ -20,11 +20,21 @@ export async function removeLoadingBar(plugin: GraphideaPlugin, file: TFile) {
     }
 }
 
+function validateSettings(plugin: GraphideaPlugin): boolean {
+    const { modelProvider, modelAPIKey, modelID, email } = plugin.settings;
+    if (!modelProvider || !modelAPIKey || !modelID || !email) {
+        new Notice('Please fill in all missing values in the settings.');
+        return false;
+    }
+    return true;
+}
+
 export function registerCommands(plugin: GraphideaPlugin) {
     plugin.addCommand({
         id: 'start-deep-research',
         name: 'Start Deep Research',
         callback: async () => {
+            if (!validateSettings(plugin)) return;
             const file = plugin.app.vault.getFiles().find((f: TFile) => f.name === 'IDEA.md');
             if (!file) {
                 new Notice('IDEA.md not found in the vault.');
@@ -73,6 +83,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'inject-backlinks',
         name: 'Inject Backlinks',
         callback: async () => {
+            if (!validateSettings(plugin)) return;
             const file = plugin.app.workspace.getActiveFile();
             if (!file) {
                 new Notice('No active file. Please open a note first.');
@@ -103,6 +114,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'start-idea-creation',
         name: 'Generate Thesis',
         callback: async () => {
+            if (!validateSettings(plugin)) return;
             new Notice('Starting Idea Creation...');
             plugin.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
             plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent in Progress');
