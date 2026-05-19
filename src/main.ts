@@ -8,6 +8,7 @@ import { setupMarkdowns } from 'backend/utils/helper';
 import { drainOfflineQueue, onFileCreated, onFileDeleted, onFileModified } from 'backend/vector-db/file-listeners';
 import { indexVault } from 'backend/vector-db/auto-index';
 import setupVariables from 'backend/utils/setup';
+import { validateServers } from 'backend/utils/server-check';
 
 export default class GraphQueryPlugin extends Plugin {
     settings: GraphQuerySettings;
@@ -29,10 +30,13 @@ export default class GraphQueryPlugin extends Plugin {
         registerCommands(this);
         setupFileExplorerIcons(this);
 
-        this.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
-        this.agentStatusBarItem.setAttribute('aria-label', 'Indexing Files ....');
-        await drainOfflineQueue(this.app.vault);
-        await indexVault(this.app.vault);
+        const serversRunning = await validateServers();
+        if (serversRunning) {
+            this.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
+            this.agentStatusBarItem.setAttribute('aria-label', 'Indexing Files ....');
+            await drainOfflineQueue(this.app.vault);
+            await indexVault(this.app.vault);
+        }
 
         this.registerEvent(this.app.vault.on('create', (file) => {
             if (file instanceof TFile && file.extension === 'md')

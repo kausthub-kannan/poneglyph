@@ -5,6 +5,7 @@ import { ChromaClient } from 'chromadb-client';
 import { injectBacklinks } from 'backend/vector-db/back-link';
 import { createIdeas } from 'backend/agents/idea-creation';
 import { IDEA_MD_TEMPLATE, LOADING_BAR_BLOCK } from 'backend/utils/templates';
+import { validateServers } from 'backend/utils/server-check';
 
 async function injectLoadingBar(plugin: GraphideaPlugin, file: TFile) {
     const content = await plugin.app.vault.read(file);
@@ -20,10 +21,14 @@ export async function removeLoadingBar(plugin: GraphideaPlugin, file: TFile) {
     }
 }
 
-function validateSettings(plugin: GraphideaPlugin): boolean {
+async function validateSettings(plugin: GraphideaPlugin): Promise<boolean> {
     const { modelProvider, modelAPIKey, modelID, email } = plugin.settings;
     if (!modelProvider || !modelAPIKey || !modelID || !email) {
         new Notice('Please fill in all missing values in the settings.');
+        return false;
+    }
+    const serversRunning = await validateServers();
+    if (!serversRunning) {
         return false;
     }
     return true;
@@ -34,7 +39,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'start-deep-research',
         name: 'Start Deep Research',
         callback: async () => {
-            if (!validateSettings(plugin)) return;
+            if (!(await validateSettings(plugin))) return;
             const file = plugin.app.vault.getFiles().find((f: TFile) => f.name === 'IDEA.md');
             if (!file) {
                 new Notice('IDEA.md not found in the vault.');
@@ -83,7 +88,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'inject-backlinks',
         name: 'Inject Backlinks',
         callback: async () => {
-            if (!validateSettings(plugin)) return;
+            if (!(await validateSettings(plugin))) return;
             const file = plugin.app.workspace.getActiveFile();
             if (!file) {
                 new Notice('No active file. Please open a note first.');
@@ -114,7 +119,7 @@ export function registerCommands(plugin: GraphideaPlugin) {
         id: 'start-idea-creation',
         name: 'Generate Thesis',
         callback: async () => {
-            if (!validateSettings(plugin)) return;
+            if (!(await validateSettings(plugin))) return;
             new Notice('Starting Idea Creation...');
             plugin.agentStatusBarItem.style.color = 'var(--color-yellow, #ffbf00)';
             plugin.agentStatusBarItem.setAttribute('aria-label', 'Agent in Progress');
