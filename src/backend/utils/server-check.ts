@@ -11,7 +11,7 @@ export async function checkOllama(): Promise<boolean> {
 
 export async function checkChroma(): Promise<boolean> {
     try {
-        const response = await requestUrl({ url: 'http://localhost:8000/api/v1/heartbeat', method: 'GET' });
+        const response = await requestUrl({ url: 'http://localhost:8000/api/v2/heartbeat', method: 'GET' });
         return response.status === 200;
     } catch (e) {
         return false;
